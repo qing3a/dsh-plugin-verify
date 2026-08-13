@@ -8,7 +8,8 @@ const ownerRepo = process.argv[2]
 const branch = process.argv[3] ?? 'main'
 
 // 1. Get files in tree order (git orders dirs before files → parent creation works)
-const files = execFileSync('git', ['ls-files'], { encoding: 'utf8' })
+// core.quotePath=false: 中文/非 ASCII 文件名输出原始 UTF-8，避免八进制转义
+const files = execFileSync('git', ['-c', 'core.quotePath=false', 'ls-files'], { encoding: 'utf8' })
   .split('\n')
   .filter(Boolean)
   .sort((a, b) => a.split('/').length - b.split('/').length)
