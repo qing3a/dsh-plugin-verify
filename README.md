@@ -39,13 +39,36 @@
 
 > 更新于 2026-08-14 · 判定方法：[dsh-plugin-verify CLI](#插件作者如何获得-verified-徽标)
 
-### 🔌 插件与工具
+### 🛠 调试与观测（Debug & Observability）
+
+*事件审计、会话诊断、运行观测——让插件作者/开发者看清 harness 内部发生了什么*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
 | [dsh-event-auditor](https://github.com/qing3a/dsh-event-auditor) | ✅ | harness 事件流审计面板：事件类型/分发模式/计数；settings 热改 + /audit 命令 + headless dump | 2026-08-14 | [view](reports/event-auditor-2026-08-14.json) |
+
+### 🖥 桌面与系统（Desktop & System）
+
+*系统级集成：托盘驻留、桌面外壳、原生能力桥接*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
 | [dsh-tray](https://github.com/qing3a/dsh-tray) | ✅ | Windows 系统托盘（trayicon exe 宿主，无 native 编译）：菜单/通知/headless 降级 | 2026-08-14 | [view](reports/tray-2026-08-14.json) |
+
+### 🔒 安全与合规（Security & Compliance）
+
+*密钥扫描、危险模式检测、合规工具*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
 | [dsh-security-scan](https://github.com/ben7am1n/dsh-security-scan) | ✅ | Secret & dangerous-pattern scanner（zero deps）——首个通过的外部插件 | 2026-08-14 | [view](reports/security-scan-2026-08-14.json) |
+
+### 📊 效率与监控（Productivity & Monitoring）
+
+*Token 消耗、账户余额、运行指标——成本与资源可见性*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
 | [dsh-balance](https://github.com/TwotwoPiggy/dsh-balance) | ✅ | Web 聊天框实时 Token 消耗估算 + DeepSeek 账户余额（纯 JS，ctx.inject 动态注入） | 2026-08-14 | [view](reports/balance-2026-08-14.json) |
 
 > 你的插件还没在？[拿徽标只要 2 分钟](#插件作者如何获得-verified-徽标)。
@@ -106,6 +129,34 @@ npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
 - **提交新验证**：验证通过 → PR 收录进目录（附 `verify-report.json`）；修正链接/分类/描述 → 小 PR 即可
 - **报告新发现**：验证失败或有疑问 → issue（附 `verify-report.json` 与复现步骤）
 - **不要**在 PR 里复制私有 issue、密钥、成员信息或大段第三方内容
+
+## 产品分析（展望）
+
+> 本目录现阶段的判定是**可运行分析**（证明"能跑、不破坏 agent"）——这是地基。
+> 下一步演进为**产品分析**：为每个插件建立产品档案，从"值得用"进一步回答"值得进生态"。
+
+| 维度 | 可运行分析（现在） | 产品分析（演进） |
+|---|---|---|
+| 回答 | 插件能加载吗？waterfall 完整吗？ | 解决什么问题？给谁用？与生态重叠吗？ |
+| 证据 | verify-report.json（7/7 waterfall） | 产品档案：功能定位/目标用户/生态关系/质量信号（维护/依赖/许可） |
+| 收录门槛 | 运行时验证通过 | 验证通过 + 产品评估 |
+
+**产品档案模板**（目录变厚后逐项填充）：
+
+```json
+{
+  "plugin": "dsh-xxx",
+  "category": "效率与监控",
+  "problem": "解决什么问题",
+  "users": "目标用户",
+  "overlap": "与生态内哪些插件重叠",
+  "quality": { "maintained": true, "deps": "zero-deps", "license": "MIT" },
+  "verification": "verify-report.json 链接",
+  "insight": "产品洞察"
+}
+```
+
+这套产品评估维度借鉴了 haidian 城市设计征集的多维评审思路（相关性/原创性/可实施性/表达完整度）——把"方案评审"方法论迁移到"插件评审"。
 
 ## 边界与免责
 
