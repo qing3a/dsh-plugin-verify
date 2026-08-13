@@ -108,6 +108,26 @@ function installPlugin(repoPath: string, target: string, label: string): void {
   }
 }
 
+/** 验证后自清理目标插件（读 package.json name 移除）。
+ * ⚠️ 必须做：失败的插件会永久 link 进 headless profile，若它声明了 headless
+ * 缺失的必选服务（如 webServer）会 pending 阻塞整个 profile 树，污染后续所有验证。 */
+function removePlugin(repoPath: string, pluginPath: string): void {
+  try {
+    const abs = resolve(pluginPath)
+    const pkg = JSON.parse(readFileSync(join(abs, 'package.json'), 'utf8')) as { name?: string }
+    if (!pkg.name) return
+    const res = run('pnpm', ['dsh', 'plugin', '--profile', 'headless', 'remove', pkg.name], {
+      cwd: repoPath,
+      timeoutMs: 120_000,
+    })
+    if (res.code !== 0) {
+      process.stderr.write(`[warn] 自清理失败（${pkg.name}）: ${res.stdout.slice(-200)}\n`)
+    }
+  } catch {
+    // 自清理失败不阻塞验证结论
+  }
+}
+
 /** 启动 mock-llm，返回句柄。用 node 直跑 bin.ts（避免 shell:true 拼参数破坏 JSON 引号） */
 function startMockLlm(repoPath: string): { child: ReturnType<typeof spawn>; port: number; ready: Promise<void> } {
   const port = 8000
@@ -232,6 +252,7 @@ export async function main(): Promise<number> {
       return result.pass ? 0 : 1
     } finally {
       killTree(mock.child)
+      removePlugin(args.repoPath, args.pluginPath)  // 自清理，防残留阻塞
     }
   } catch (err) {
     console.error(`✗ ${(err as Error).message}`)
