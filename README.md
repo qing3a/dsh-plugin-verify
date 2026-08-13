@@ -42,6 +42,12 @@ npx dsh-plugin-verify ~/my-dsh-plugin --repo ~/deepseek-harness
 
 验证通过的真实插件收录于：**[index.html](index.html)**（GitHub Pages 托管）。
 
+## 文章
+
+- [从零拆解 DSH 插件集（一）：dsh-web-ui 全景与插件集范式](posts/01-dsh-web-ui-拆解.md)
+- [从零写一个 DSH 插件并跑通：踩坑全记录（二）](posts/02-从零写DSH插件踩坑全记录.md)
+- [无 API Key 验证 DSH 插件：mock-llm 实战与 waterfall 捕获实证（三）](posts/03-无APIKey验证DSH插件.md)
+
 ## 原理
 
 - **自包含**：CLI 自带迷你审计器 `auditor/`（cordis 插件），经 `dsh plugin add link:` 注入 headless profile，不依赖任何其他插件
