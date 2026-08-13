@@ -1,5 +1,5 @@
 {
-  "name": "@dsh-external/dsh-plugin-verify",
+  "name": "@qing3a/dsh-plugin-verify",
   "version": "0.1.0",
   "description": "验证 DSH 插件的 CLI：一条命令跑 mock-llm 完整 agent 循环，检查 waterfall 链完整性与零副作用，产出验证报告",
   "type": "module",
@@ -9,7 +9,13 @@
   },
   "files": [
     "lib",
-    "auditor"
+    "index.html",
+    "auditor/lib",
+    "auditor/index.ts",
+    "auditor/cordis.patch.yml",
+    "auditor/package.json",
+    "skills",
+    "scripts"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -22,5 +28,18 @@
   "devDependencies": {
     "@types/node": "^26.2.0",
     "typescript": "^7.0.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qing3a/dsh-plugin-verify.git"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "dsh-plugin",
+    "verify",
+    "validation",
+    "runtime-test",
+    "plugin-verification"
+  ]
 }

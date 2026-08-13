@@ -1,5 +1,5 @@
 {
-  "name": "@dsh-external/verify-auditor",
+  "name": "@qing3a/verify-auditor",
   "version": "0.1.0",
   "description": "dsh-plugin-verify 自包含迷你审计器：监听 waterfall 链并 dump（CLI 内部使用）",
   "type": "module",
