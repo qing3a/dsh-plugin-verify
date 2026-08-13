@@ -1,0 +1,12 @@
+{
+  "schema": "dsh-plugin-submission/v1",
+  "checks": {
+    "repo_public": true,
+    "topic_dsh_plugin": true,
+    "package_json_valid": true,
+    "deps_declared": true,
+    "license_present": true,
+    "readme_complete": true,
+    "verification_passed": true
+  }
+}
