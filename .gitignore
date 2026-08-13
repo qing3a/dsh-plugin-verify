@@ -1,0 +1,6 @@
+node_modules/
+lib/
+out/
+out-tray/
+*.log
+.DS_Store
