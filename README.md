@@ -1,94 +1,116 @@
-# dsh-plugin-verify
+# dsh-plugin-verify — Verified DSH Plugins
 
-**DSH（DeepSeek Harness）生态的可信插件守门人**——验证为准入，判定为核心，目录为货架，内容为复利。
+> DSH 插件**判定站**：每个插件经过同一套运行时验证（7/7 waterfall + tools/result），通过才给 ✅ Verified 徽标。**它有的我们都有，且更直观——不靠静态猜测，靠实测判定。**
 
-`verify` 在这里是双关：**验证动作**（一条命令跑运行时检查）+ **判定结果**（Verified 徽标 = 通过审查的插件）。
+![verified](https://img.shields.io/badge/Verified%20插件-4-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
 
----
+- **找可信插件**：按功能分类浏览，每个插件带 Verified 徽标 + 验证日期 + 可复现报告——不是嘴上说"能用"，是实测过"零副作用"
+- **装得放心**：徽标 = 通过了完整 agent 循环审查；附带安装指引与安全提示
+- **给插件做判定**：插件作者一条命令跑验证拿徽标；顺带帮你发现真实 bug
 
-## 为什么存在
+[浏览 Verified 目录](#verified-目录) · [判定规则](#判定规则) · [插件作者：拿徽标](#插件作者如何获得-verified-徽标) · [使用者：安全安装](#使用者如何安全安装) · [贡献者](#贡献者)
 
-DSH 插件生态有个真空：**观测很多，判定没有**。
+> [!IMPORTANT]
+> **Verified 徽标 ≠ 官方背书。** 判定基于当日 mainline、证据可复现；DSH 每天更新，插件可能漂移，安装前请查看验证日期与插件自身 README。
 
-- [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 是优秀的**观测雷达**——它收录一切、标记六种状态，但明确"不合并成兼容率、不背书、不是包管理器"（它自己的 README 说的）。
-- **"哪个插件值得装？"** 这个问题，生态里没人回答。
+## 从这里开始
 
-dsh-plugin-verify 填的就是这个真空：**做判定**。每个插件经过同一套运行时审查，通过 = 拿到 Verified 徽标，进入可信目录。
+| 你的目标 | 跳转入口 |
+|---|---|
+| 找一个可信插件 | [Verified 目录](#verified-目录) |
+| 看懂徽标/状态 | [状态体系](#状态体系) |
+| 给插件拿徽标 | [插件作者](#插件作者如何获得-verified-徽标) |
+| 安全安装插件 | [使用者](#使用者如何安全安装) |
+| 想了解判定凭什么 | [判定规则](#判定规则) |
+| 提交/维护 | [贡献者](#贡献者) |
+| 了解边界 | [边界与免责](#边界与免责) |
 
-## 它是什么（三合一）
+## 状态体系
 
-| 组件 | 是什么 | 对应生态位 |
-|---|---|---|
-| **dsh-plugin-verify CLI** | 一条命令跑完整运行时验证，产出报告 | 验证能力（护城河） |
-| **Verified 徽标** | 通过审查的判定信号 | 判定（差异化，awesome 不做） |
-| **Verified DSH Plugins 目录** | 只收通过验证的插件 + 一键安装入口 | 货架（信任溢出成交易） |
+| 徽标 | 状态 | 含义 | 它不说明什么 |
+|---|---|---|---|
+| ✅ **Verified** | 已验证 | 通过完整运行时验证（7/7 waterfall + tools/result），证据可复现 | 非官方背书、非全功能测试、非安全审计 |
+| ⏳ **未验证** | 未验证 | 已收录但尚未运行时验证 | 不代表坏，只是还没测 |
+| ❌ **验证失败** | 失败 | 运行时验证发现问题（有报告） | 不代表永远不可用，修复后可复测 |
 
-## 快速开始
+> 每个判定附带四项：**插件 commit · mainline commit · 验证日期 · 报告**。缺一项即降低信任等级。
 
-```bash
-# 前提：DSH 源码 checkout 已构建（build:lib:host + build:lib:client）
-npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
-# ✅ 通过 | 捕获事件: 13 | waterfall: 7/7 | tools/result: 是
-# 报告: ./verify-report.json
-```
+## Verified 目录
 
-退出码：`0` 通过 / `1` 未通过 / `2` 环境错误。
+> 更新于 2026-08-14 · 判定方法：[dsh-plugin-verify CLI](#插件作者如何获得-verified-徽标)
 
-## 验证标准（判定规则，公开透明）
+### 🔌 插件与工具
 
-用 mock-llm 触发真实 agent 循环（`tool_call_success` → bash 工具调用），检查整条 waterfall 链：
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [dsh-event-auditor](https://github.com/qing3a/dsh-event-auditor) | ✅ | harness 事件流审计面板：事件类型/分发模式/计数；settings 热改 + /audit 命令 + headless dump | 2026-08-14 | [view](reports/event-auditor-2026-08-14.json) |
+| [dsh-tray](https://github.com/qing3a/dsh-tray) | ✅ | Windows 系统托盘（trayicon exe 宿主，无 native 编译）：菜单/通知/headless 降级 | 2026-08-14 | [view](reports/tray-2026-08-14.json) |
+| [dsh-security-scan](https://github.com/ben7am1n/dsh-security-scan) | ✅ | Secret & dangerous-pattern scanner（zero deps）——首个通过的外部插件 | 2026-08-14 | [view](reports/security-scan-2026-08-14.json) |
+| [dsh-balance](https://github.com/TwotwoPiggy/dsh-balance) | ✅ | Web 聊天框实时 Token 消耗估算 + DeepSeek 账户余额（纯 JS，ctx.inject 动态注入） | 2026-08-14 | [view](reports/balance-2026-08-14.json) |
+
+> 你的插件还没在？[拿徽标只要 2 分钟](#插件作者如何获得-verified-徽标)。
+
+## 判定规则（透明公开）
+
+**为什么是运行时判定**：静态检查只能证明"能加载"，证明不了"不破坏行为"。waterfall 监听器漏调 `next()` 会静默吞掉 agent 的默认行为——这类 bug 只有真实循环才暴露。
+
+**判定流程**（mock-llm 触发完整 agent 循环，tool_call_success → bash 工具调用）：
 
 ```
 system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 → tools/pre-execute → tools/execute → tools/post-execute → tools/result
 ```
 
-**通过 = 7/7 waterfall 链完整 + `tools/result` 收尾**。含义：插件的 waterfall 监听器正确透传了 `next()`，零副作用——这是插件"不会静默破坏 agent 行为"的最强证明。
+**通过标准**：7/7 waterfall 链完整 + `tools/result` 收尾 = 插件零副作用（所有 waterfall 监听器正确透传 `next()`）。
 
-判定基于**当日 mainline**；DSH 每天更新，插件可能漂移，报告标注日期，可复核。
+**报告怎么读**（`verify-report.json`）：
 
-## Verified 徽标
+```json
+{ "pass": true, "waterfallFound": [7/7 事件], "waterfallMissing": [], "detail": "捕获事件: 13 | tools/result: 是" }
+```
 
-通过验证的插件获得徽标并进入目录：
-
-| 徽标 | 含义 |
-|---|---|
-| ✅ Verified | 已通过运行时验证（当日 mainline、证据可复现） |
-
-**徽标 ≠ 官方背书**。它是社区判定：在"这个插件能装"和"这个插件不会破坏 agent 循环"之间划了一条可信的线。
+- `pass: true` + `missing: []` = ✅ 通过
+- `missing` 列出哪段链没出现 → 定位插件哪个 waterfall 监听器有问题
+- 每份报告含插件路径、DSH checkout、日期 → 可复现
 
 ## 插件作者：如何获得 Verified 徽标
 
-1. 准备 DSH checkout + 你的插件
-2. `npx dsh-plugin-verify <你的插件> --repo <DSH checkout>`
-3. 通过 → 提 PR/Issue 收录进 [Verified 目录](https://qing3a.github.io/dsh-plugin-verify/)（附 `verify-report.json`）
-
-**为什么要来**：在 awesome 的"待测/未知"海洋里，Verified 徽标让你脱颖而出；验证流程还会帮你发现真实 bug（[dsh-sentinel 案例](https://github.com/fuhefei/dsh-sentinel/issues/4)：headless 加载失败被验证工具抓出）。
-
-## 使用者：如何安装可信插件
-
-从目录选一个 ✅ Verified 插件，然后：
-
 ```bash
-dsh plugin --profile web add <插件包名>
+# 1. 准备 DSH checkout（已 build:lib:host && build:lib:client）
+# 2. 跑验证
+npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
+# ✅ 通过 | 捕获事件: 13 | waterfall: 7/7 | tools/result: 是
+# 3. 通过后提 PR/Issue 收录（附 verify-report.json）
+# 4. 上架 → 获得徽标，进入目录
 ```
 
-（安装命令以插件自身 README 为准；Verified 徽标保证它至少通过了运行时审查。）
+**为什么要来**：
+- 在 288 个插件的"待测/未知"海洋里，✅ 徽标让你**脱颖而出**
+- 验证会**帮你发现真实 bug**（[dsh-sentinel 案例](https://github.com/fuhefei/dsh-sentinel/issues/4)：headless 加载失败被验证工具抓出）
+- 报告可直接作为 [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 登记 PR 的运行实测证据
 
-## 证据与报告
+**收录条件**：公开仓库 + `dsh-plugin` topic + 合法 package.json + 运行时依赖声明 + 许可证 + README（含安装/卸载/最小示例）。命名用你有权控制的 scope，不占 `@deepseek-ai/*` 保留命名空间。
 
-- `verify-report.json`：插件/DSH 路径、日期、pass、waterfall 链明细——**可复现，不是口头结论**
-- 报告归档在目录页，每插件一份
-- 验证方法学：[官方 Discussion 462](https://github.com/deepseek-ai/deepseek-harness/discussions/462)
+## 使用者：如何安全安装
 
-## 与 awesome-dsh-plugins 的关系（互补，不竞争）
+1. 从[目录](#verified-目录)选 ✅ Verified 插件
+2. 查看验证日期（久于一周需谨慎——DSH 每天更新）与[报告](#判定规则公开透明)
+3. `dsh plugin --profile web add <插件包名>`（以插件自身 README 为准）
+4. 先在隔离 profile 试加载，不提供生产密钥
+5. 保留配置与锁文件，失败可回滚
 
-| | awesome-dsh-plugins | dsh-plugin-verify |
-|---|---|---|
-| 角色 | 观测雷达（收录一切） | 可信守门人（只收审查通过的） |
-| 输出 | 6 种观测状态，不判定 | ✅ Verified 判定 |
-| 交付 | 不是包管理器 | 一键安装入口 |
-| 关系 | 它的验证报告可作为我们收录的证据 | 我们的 Verified 徽标可回填它的"运行可用"层 |
+> ⚠️ 安装任何第三方插件前：查看源码、权限、依赖、许可证与验证日期。徽标 ≠ 安全审计。
+
+## 贡献者
+
+- **提交新验证**：验证通过 → PR 收录进目录（附 `verify-report.json`）；修正链接/分类/描述 → 小 PR 即可
+- **报告新发现**：验证失败或有疑问 → issue（附 `verify-report.json` 与复现步骤）
+- **不要**在 PR 里复制私有 issue、密钥、成员信息或大段第三方内容
+
+## 边界与免责
+
+- **徽标 ≠ 官方背书** ≠ 完整功能测试 ≠ 安全审计；只证明"在记录的环境与 commit 上通过了运行时审查"
+- **与 [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 的关系**：它是全量观测雷达（288 仓库、静态判定），我们做实测定判定——**功能全覆盖、判定更严格、表现更直观**；两者互补，读者可互跳
 
 ## 文章
 

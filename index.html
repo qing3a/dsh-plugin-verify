@@ -3,87 +3,141 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Verified DSH Plugins — 通过运行时验证的 DeepSeek Harness 插件</title>
+<title>Verified DSH Plugins — 实测判定的 DSH 插件站</title>
 <style>
   :root { color-scheme: light dark; }
-  body { font-family: system-ui, -apple-system, sans-serif; margin: 0 auto; max-width: 860px; padding: 2rem 1.5rem 4rem; line-height: 1.6; }
+  body { font-family: system-ui, -apple-system, sans-serif; margin: 0 auto; max-width: 900px; padding: 2rem 1.5rem 4rem; line-height: 1.6; }
   h1 { font-size: 1.6rem; margin-bottom: .3rem; }
-  .sub { color: #888; margin-bottom: 2rem; }
-  .badge { display: inline-block; background: #1f8b4c; color: #fff; border-radius: 4px; padding: 1px 7px; font-size: .75rem; font-weight: 600; }
-  .note { background: #00000012; border-left: 3px solid #888; padding: .6rem 1rem; font-size: .9rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
-  table { border-collapse: collapse; width: 100%; font-size: .92rem; }
-  th, td { border: 1px solid #00000022; padding: .5rem .7rem; text-align: left; vertical-align: top; }
+  .sub { color: #888; margin-bottom: 1.5rem; }
+  /* 数字卡片 */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .8rem; margin: 1.2rem 0; }
+  .card { border: 1px solid #00000022; border-radius: 10px; padding: .8rem 1rem; text-align: center; }
+  .card .num { font-size: 1.8rem; font-weight: 700; }
+  .card .lbl { font-size: .8rem; color: #888; }
+  .card.green .num { color: #1f8b4c; }
+  /* 徽标 */
+  .badge { display: inline-block; border-radius: 4px; padding: 1px 7px; font-size: .75rem; font-weight: 600; }
+  .b-verified { background: #1f8b4c; color: #fff; }
+  .b-pending { background: #888; color: #fff; }
+  .b-fail { background: #c0392b; color: #fff; }
+  /* 图例 */
+  .legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .85rem; margin: .6rem 0 1.2rem; }
+  /* CTA */
+  .cta { display: flex; gap: .8rem; flex-wrap: wrap; margin: 1.4rem 0; }
+  .cta a { padding: .55rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: .92rem; }
+  .cta .primary { background: #1f8b4c; color: #fff; }
+  .cta .secondary { border: 1px solid #1f8b4c; color: #1f8b4c; }
+  /* 折叠分类 */
+  details { border: 1px solid #00000022; border-radius: 8px; margin: .6rem 0; padding: .5rem 1rem; }
+  summary { cursor: pointer; font-weight: 600; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; margin-top: .6rem; }
+  th, td { border: 1px solid #00000022; padding: .45rem .6rem; text-align: left; vertical-align: top; }
   th { background: #0000000a; white-space: nowrap; }
   code { background: #00000014; border-radius: 3px; padding: 0 4px; font-size: .85em; }
-  .howto { margin-top: 2.5rem; }
-  .howto ol { padding-left: 1.3rem; }
+  .note { background: #00000012; border-left: 3px solid #888; padding: .6rem 1rem; font-size: .9rem; margin: 1.2rem 0; border-radius: 0 6px 6px 0; }
+  .howto { margin-top: 2.2rem; }
   footer { margin-top: 3rem; color: #999; font-size: .8rem; }
 </style>
 </head>
 <body>
-<h1>Verified DSH Plugins <span class="badge">✓ verified</span></h1>
-<p class="sub"><strong>DSH 生态的可信插件守门人</strong> —— 由 <a href="https://github.com/qing3a/dsh-plugin-verify">dsh-plugin-verify</a> 判定：验证为准入，徽标为判定，只收录通过运行时审查的插件。</p>
+
+<h1>Verified DSH Plugins</h1>
+<p class="sub"><strong>DSH 插件判定站</strong> —— 每个插件经过完整运行时验证（7/7 waterfall + tools/result），通过才给 ✅ 徽标。不靠静态猜测，靠实测判定。</p>
+
+<!-- 数字卡片 -->
+<div class="cards">
+  <div class="card green"><div class="num">4</div><div class="lbl">Verified 插件</div></div>
+  <div class="card"><div class="num">100%</div><div class="lbl">判定=运行时实测</div></div>
+  <div class="card"><div class="num">2026-08-14</div><div class="lbl">最近验证</div></div>
+  <div class="card"><div class="num">7/7</div><div class="lbl">waterfall 判定标准</div></div>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <a class="primary" href="#catalog">🔍 找可信插件</a>
+  <a class="secondary" href="#authors">🏅 给插件拿徽标（2 分钟）</a>
+</div>
+
+<!-- 状态图例 -->
+<div class="legend">
+  <span><span class="badge b-verified">✓ Verified</span> 通过运行时验证</span>
+  <span><span class="badge b-pending">⏳ 未验证</span> 已收录未测</span>
+  <span><span class="badge b-fail">✗ 失败</span> 验证发现问题</span>
+</div>
 
 <div class="note">
-<strong>判定规则（公开透明）：</strong>用 mock-llm 触发完整 agent 循环（tool_call_success → bash 工具调用），检查
+<strong>判定规则：</strong>mock-llm 触发完整 agent 循环 →
 <code>system-prompt/assemble → agent/pre-step → agent/request → llm/stream → tools/pre-execute → tools/execute → tools/post-execute → tools/result</code>
-整条 waterfall 链完整出现、且 agent 正常收尾 —— <strong>7/7 + tools/result = 插件零副作用</strong>（waterfall 监听器正确透传 <code>next()</code>）。
-<strong>徽标 ≠ 官方背书</strong>；判定基于当日 mainline，DSH 每天更新，插件可能漂移，报告标注日期可复核。</div>
+→ <strong>7/7 完整 + tools/result = 零副作用</strong>（waterfall 监听器正确透传 next()）。
+<strong>徽标 ≠ 官方背书</strong>；判定基于当日 mainline，报告可复现、标注日期。
+</div>
 
-<h2>已收录插件（Verified）</h2>
+<!-- Verified 目录 -->
+<h2 id="catalog">Verified 目录</h2>
+
+<details open>
+<summary>🔌 插件与工具（4）</summary>
 <table>
-<thead>
-<tr><th>插件</th><th>仓库</th><th>说明</th><th>验证日期</th><th>验证报告</th></tr>
-</thead>
+<thead><tr><th>插件</th><th>状态</th><th>说明</th><th>验证日期</th><th>报告</th></tr></thead>
 <tbody>
 <tr>
-  <td><code>dsh-event-auditor</code></td>
-  <td><a href="https://github.com/qing3a/dsh-event-auditor">qing3a/dsh-event-auditor</a></td>
-  <td>harness 事件流审计面板：观察事件类型/分发模式/计数/最近事件；settings 热改 + /audit 会话命令 + headless dump</td>
+  <td><a href="https://github.com/qing3a/dsh-event-auditor"><code>dsh-event-auditor</code></a></td>
+  <td><span class="badge b-verified">✓ Verified</span></td>
+  <td>harness 事件流审计面板：事件类型/分发模式/计数；settings 热改 + /audit 命令 + headless dump</td>
   <td>2026-08-14</td>
   <td><a href="reports/event-auditor-2026-08-14.json">view</a></td>
 </tr>
 <tr>
-  <td><code>dsh-tray</code></td>
-  <td><a href="https://github.com/qing3a/dsh-tray">qing3a/dsh-tray</a></td>
-  <td>Windows 系统托盘插件（trayicon exe 宿主，无 native 编译）：菜单/通知/headless 降级</td>
+  <td><a href="https://github.com/qing3a/dsh-tray"><code>dsh-tray</code></a></td>
+  <td><span class="badge b-verified">✓ Verified</span></td>
+  <td>Windows 系统托盘（trayicon exe 宿主，无 native 编译）：菜单/通知/headless 降级</td>
   <td>2026-08-14</td>
   <td><a href="reports/tray-2026-08-14.json">view</a></td>
 </tr>
 <tr>
-  <td><code>dsh-security-scan</code></td>
-  <td><a href="https://github.com/ben7am1n/dsh-security-scan">ben7am1n/dsh-security-scan</a></td>
-  <td>Secret &amp; dangerous-pattern scanner（zero deps）——第一个通过验证的外部插件</td>
+  <td><a href="https://github.com/ben7am1n/dsh-security-scan"><code>dsh-security-scan</code></a></td>
+  <td><span class="badge b-verified">✓ Verified</span></td>
+  <td>Secret &amp; dangerous-pattern scanner（zero deps）——首个通过的外部插件</td>
   <td>2026-08-14</td>
   <td><a href="reports/security-scan-2026-08-14.json">view</a></td>
 </tr>
 <tr>
-  <td><code>dsh-balance</code></td>
-  <td><a href="https://github.com/TwotwoPiggy/dsh-balance">TwotwoPiggy/dsh-balance</a></td>
-  <td>DSH Web 聊天框底部实时估算 Token 消耗并显示 DeepSeek 账户余额（纯 JS，ctx.inject 动态注入）</td>
+  <td><a href="https://github.com/TwotwoPiggy/dsh-balance"><code>dsh-balance</code></a></td>
+  <td><span class="badge b-verified">✓ Verified</span></td>
+  <td>Web 聊天框实时 Token 消耗估算 + DeepSeek 账户余额（纯 JS，ctx.inject 动态注入）</td>
   <td>2026-08-14</td>
   <td><a href="reports/balance-2026-08-14.json">view</a></td>
 </tr>
 </tbody>
 </table>
+</details>
 
-<div class="howto">
-<h2>插件作者：如何获得 Verified 徽标</h2>
+<!-- 插件作者 -->
+<div class="howto" id="authors">
+<h2>插件作者：拿徽标只要 2 分钟</h2>
+<pre><code>npx dsh-plugin-verify &lt;你的插件路径&gt; --repo &lt;DSH checkout&gt;
+# ✅ 通过 | 捕获事件: 13 | waterfall: 7/7 | tools/result: 是
+</code></pre>
 <ol>
-  <li>准备一个 DSH 源码 checkout（<code>pnpm run build:lib:host && build:lib:client</code> 已构建）</li>
-  <li><code>npx dsh-plugin-verify &lt;你的插件路径&gt; --repo &lt;DSH checkout&gt;</code></li>
-  <li>通过（7/7 waterfall）→ 提 PR/Issue 收录，附 <code>verify-report.json</code></li>
+  <li>准备 DSH checkout（<code>build:lib:host && build:lib:client</code>）</li>
+  <li>跑上面的命令 → 通过 → 提 PR/Issue 收录（附 <code>verify-report.json</code>）</li>
+  <li>上架拿徽标</li>
 </ol>
-<p><strong>为什么要来</strong>：在 awesome 的"待测/未知"海洋里，Verified 徽标让你脱颖而出；验证还会帮你发现真实 bug（<a href="https://github.com/fuhefei/dsh-sentinel/issues/4">dsh-sentinel 案例</a>）。验证方法学详见 <a href="https://github.com/deepseek-ai/deepseek-harness/discussions/462">官方 Discussion 462</a>。</p>
+<p><strong>为什么要来</strong>：288 个插件的"待测/未知"海洋里，✅ 徽标让你脱颖而出；验证顺带帮你发现真实 bug（<a href="https://github.com/fuhefei/dsh-sentinel/issues/4">dsh-sentinel 案例</a>）。</p>
 </div>
 
+<!-- 使用者 -->
 <div class="howto">
-<h2>使用者：安装可信插件</h2>
-<p>从上方选一个 ✅ Verified 插件，然后：</p>
-<pre><code>dsh plugin --profile web add &lt;插件包名&gt;</code></pre>
-<p>（安装命令以插件自身 README 为准；Verified 徽标保证它至少通过了运行时审查。）</p>
+<h2>使用者：安全安装</h2>
+<ol>
+  <li>从目录选 ✅ 插件，查看验证日期（久于一周需谨慎——DSH 每天更新）</li>
+  <li><code>dsh plugin --profile web add &lt;插件包名&gt;</code>（以插件自身 README 为准）</li>
+  <li>先在隔离 profile 试加载，不提供生产密钥；保留配置与锁文件便于回滚</li>
+</ol>
+<p class="note">⚠️ 安装任何第三方插件前：查看源码、权限、依赖、许可证与验证日期。<strong>徽标 ≠ 安全审计。</strong></p>
 </div>
 
+<!-- 文章 -->
 <div class="howto">
 <h2>文章</h2>
 <ul>
@@ -94,7 +148,7 @@
 </div>
 
 <footer>
-社区判定 · 非官方 · 与 <a href="https://github.com/AdamPlatin123/awesome-dsh-plugins">awesome-dsh-plugins</a>（观测雷达）互补 · <a href="https://github.com/qing3a/dsh-plugin-verify">dsh-plugin-verify</a>
+实测判定 · 非官方 · 与 <a href="https://github.com/AdamPlatin123/awesome-dsh-plugins">awesome-dsh-plugins</a>（全量观测）互补 · <a href="https://github.com/qing3a/dsh-plugin-verify">dsh-plugin-verify</a>
 </footer>
 </body>
 </html>
