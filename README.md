@@ -2,7 +2,7 @@
 
 验证 DSH（DeepSeek Harness）插件的 CLI：一条命令跑 mock-llm 完整 agent 循环，检查 waterfall 链完整性与零副作用，产出验证报告。
 
-**生态空白**：awesome-dsh-plugins 雷达显示 286 个插件仅 5 个做过运行时测试、0 个通过——本工具把「运行时验证」从方法论变成一条命令。
+**生态空白**：DSH 插件的运行时验证几乎空白（[awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 雷达的运行时测试层覆盖极低）——本工具把「运行时验证」从方法论变成一条命令。
 
 ## 它验证什么
 
