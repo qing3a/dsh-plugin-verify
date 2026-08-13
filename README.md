@@ -18,8 +18,8 @@
 | 你的目标 | 跳转入口 |
 |---|---|
 | 找一个可信插件 | [Verified 目录](#verified-目录) |
+| 投稿你的插件（上架） | [插件作者：投稿](#插件作者投稿你的插件2-分钟上架) |
 | 看懂徽标/状态 | [状态体系](#状态体系) |
-| 给插件拿徽标 | [插件作者](#插件作者如何获得-verified-徽标) |
 | 安全安装插件 | [使用者](#使用者如何安全安装) |
 | 想了解判定凭什么 | [判定规则](#判定规则) |
 | 提交/维护 | [贡献者](#贡献者) |
@@ -96,21 +96,28 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 - `missing` 列出哪段链没出现 → 定位插件哪个 waterfall 监听器有问题
 - 每份报告含插件路径、DSH checkout、日期 → 可复现
 
-## 插件作者：如何获得 Verified 徽标
+## 插件作者：投稿你的插件（2 分钟上架）
+
+**这里是一个插件市场，不是一个清单。** 投稿 = 验证 + 上架 = 获得徽标 + 被发现 + 被安装。
 
 ```bash
 # 1. 准备 DSH checkout（已 build:lib:host && build:lib:client）
 # 2. 跑验证
 npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
 # ✅ 通过 | 捕获事件: 13 | waterfall: 7/7 | tools/result: 是
-# 3. 通过后提 PR/Issue 收录（附 verify-report.json）
-# 4. 上架 → 获得徽标，进入目录
+# 3. 通过后提交收录（见下）
+# 4. 上架 → 获得徽标，进入分类目录
 ```
 
-**为什么要来**：
-- 在 288 个插件的"待测/未知"海洋里，✅ 徽标让你**脱颖而出**
+**投稿方式**（任选）：
+- **提 PR**：在 `index.html` 的对应分类表格加一行（含报告链接）
+- **提 Issue**：附上 `verify-report.json` 链接，说明插件名/仓库/分类/一句话描述
+
+**为什么要投稿**：
+- 在 288+ 个插件的"待测/未知"海洋里，✅ 徽标让你**脱颖而出**
 - 验证会**帮你发现真实 bug**（[dsh-sentinel 案例](https://github.com/fuhefei/dsh-sentinel/issues/4)：headless 加载失败被验证工具抓出）
 - 报告可直接作为 [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 登记 PR 的运行实测证据
+- 收录进分类目录 → 用户/AI 按功能找你 → 被安装
 
 **收录条件**：公开仓库 + `dsh-plugin` topic + 合法 package.json + 运行时依赖声明 + 许可证 + README（含安装/卸载/最小示例）。命名用你有权控制的 scope，不占 `@deepseek-ai/*` 保留命名空间。
 
@@ -129,34 +136,6 @@ npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
 - **提交新验证**：验证通过 → PR 收录进目录（附 `verify-report.json`）；修正链接/分类/描述 → 小 PR 即可
 - **报告新发现**：验证失败或有疑问 → issue（附 `verify-report.json` 与复现步骤）
 - **不要**在 PR 里复制私有 issue、密钥、成员信息或大段第三方内容
-
-## 产品分析（展望）
-
-> 本目录现阶段的判定是**可运行分析**（证明"能跑、不破坏 agent"）——这是地基。
-> 下一步演进为**产品分析**：为每个插件建立产品档案，从"值得用"进一步回答"值得进生态"。
-
-| 维度 | 可运行分析（现在） | 产品分析（演进） |
-|---|---|---|
-| 回答 | 插件能加载吗？waterfall 完整吗？ | 解决什么问题？给谁用？与生态重叠吗？ |
-| 证据 | verify-report.json（7/7 waterfall） | 产品档案：功能定位/目标用户/生态关系/质量信号（维护/依赖/许可） |
-| 收录门槛 | 运行时验证通过 | 验证通过 + 产品评估 |
-
-**产品档案模板**（目录变厚后逐项填充）：
-
-```json
-{
-  "plugin": "dsh-xxx",
-  "category": "效率与监控",
-  "problem": "解决什么问题",
-  "users": "目标用户",
-  "overlap": "与生态内哪些插件重叠",
-  "quality": { "maintained": true, "deps": "zero-deps", "license": "MIT" },
-  "verification": "verify-report.json 链接",
-  "insight": "产品洞察"
-}
-```
-
-这套产品评估维度借鉴了 haidian 城市设计征集的多维评审思路（相关性/原创性/可实施性/表达完整度）——把"方案评审"方法论迁移到"插件评审"。
 
 ## 边界与免责
 
