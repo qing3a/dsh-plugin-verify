@@ -1,0 +1,19 @@
+{
+  "schema": "dsh-plugin-submission/v1",
+  "plugin": {
+    "name": "dsh-balance",
+    "repo": "TwotwoPiggy/dsh-balance",
+    "category": "效率与监控",
+    "description": "Web 聊天框实时 Token 消耗估算 + DeepSeek 账户余额",
+    "version": "0.1.0"
+  },
+  "verification": {
+    "report": "verify-report.json",
+    "date": "2026-08-14",
+    "pass": true
+  },
+  "files": {
+    "verify-report.json": "a73aa8a92f445871203241371d9834069e3129d26269841bfc576532bd05ca15",
+    "self_check.json": "714b259faa3612e8a83496461e92d1dd9b919a464f66dbe7e3862e9c6a8c1bd3"
+  }
+}
