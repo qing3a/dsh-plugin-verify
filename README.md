@@ -1,6 +1,6 @@
 # dsh-plugin-verify — Verified DSH Plugins
 
-> DSH 插件**判定站**：每个插件经过同一套运行时验证（7/7 waterfall + tools/result），通过才给 ✅ Verified 徽标。**它有的我们都有，且更直观——不靠静态猜测，靠实测判定。**
+> DSH 插件**判定站**：每个插件经过同一套运行时验证（7/7 waterfall + tools/result），通过才给 ✅ Verified 徽标。**与 awesome-dsh-plugins（全量观测）互补：它观测一切，我们做实测定判。**
 
 ![verified](https://img.shields.io/badge/Verified%20插件-4-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
 
@@ -141,7 +141,7 @@ npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
 ## 边界与免责
 
 - **徽标 ≠ 官方背书** ≠ 完整功能测试 ≠ 安全审计；只证明"在记录的环境与 commit 上通过了运行时审查"
-- **与 [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 的关系**：它是全量观测雷达（288 仓库、静态判定），我们做实测定判定——**功能全覆盖、判定更严格、表现更直观**；两者互补，读者可互跳
+- **与 [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 的关系**：它是全量观测雷达（288 仓库、静态判定），我们做实测定判定——**互为补充：它给全量信号，我们给可信结论**，读者可互跳
 
 ## 文章
 
