@@ -110,6 +110,7 @@ npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
 ```
 
 **投稿方式**（任选）：
+- **用投稿 Skill（推荐，agent 友好）**：读 [skills/submission/SKILL.md](skills/submission/SKILL.md)——按 6 步流程生成提交包（manifest + self_check + verify-report），跑 [check-submission.mjs](scripts/check-submission.mjs) 自检 gate，通过后提 PR。DSH 生态的 agent 作者可直接遵循此 skill 自动投稿。
 - **提 PR**：在 `index.html` 的对应分类表格加一行（含报告链接）
 - **提 Issue**：附上 `verify-report.json` 链接，说明插件名/仓库/分类/一句话描述
 
