@@ -22,15 +22,15 @@
 </head>
 <body>
 <h1>Verified DSH Plugins <span class="badge">✓ verified</span></h1>
-<p class="sub">只收录通过 <strong>运行时验证</strong> 的 DeepSeek Harness 插件 —— 由 <a href="https://github.com/qing3a/dsh-plugin-verify">dsh-plugin-verify</a> 实测。</p>
+<p class="sub"><strong>DSH 生态的可信插件守门人</strong> —— 由 <a href="https://github.com/qing3a/dsh-plugin-verify">dsh-plugin-verify</a> 判定：验证为准入，徽标为判定，只收录通过运行时审查的插件。</p>
 
 <div class="note">
-<strong>什么是运行时验证：</strong>用 mock-llm 触发完整 agent 循环（tool_call_success → bash 工具调用），检查
+<strong>判定规则（公开透明）：</strong>用 mock-llm 触发完整 agent 循环（tool_call_success → bash 工具调用），检查
 <code>system-prompt/assemble → agent/pre-step → agent/request → llm/stream → tools/pre-execute → tools/execute → tools/post-execute → tools/result</code>
-整条 waterfall 链完整出现、且 agent 正常收尾 —— 证明插件的 waterfall 监听器正确透传了 <code>next()</code>（零副作用）。
-<strong>收录 ≠ 官方背书</strong>；验证基于当日 mainline，DSH 每天更新，插件可能漂移，请自行复核。</div>
+整条 waterfall 链完整出现、且 agent 正常收尾 —— <strong>7/7 + tools/result = 插件零副作用</strong>（waterfall 监听器正确透传 <code>next()</code>）。
+<strong>徽标 ≠ 官方背书</strong>；判定基于当日 mainline，DSH 每天更新，插件可能漂移，报告标注日期可复核。</div>
 
-<h2>已收录插件</h2>
+<h2>已收录插件（Verified）</h2>
 <table>
 <thead>
 <tr><th>插件</th><th>仓库</th><th>说明</th><th>验证日期</th><th>验证报告</th></tr>
@@ -68,13 +68,20 @@
 </table>
 
 <div class="howto">
-<h2>如何验证你的插件（2 分钟）</h2>
+<h2>插件作者：如何获得 Verified 徽标</h2>
 <ol>
   <li>准备一个 DSH 源码 checkout（<code>pnpm run build:lib:host && build:lib:client</code> 已构建）</li>
   <li><code>npx dsh-plugin-verify &lt;你的插件路径&gt; --repo &lt;DSH checkout&gt;</code></li>
-  <li>输出 <code>✅ 通过</code> 且 waterfall 7/7 → 你的插件可在本目录收录（提 PR 或 issue）</li>
+  <li>通过（7/7 waterfall）→ 提 PR/Issue 收录，附 <code>verify-report.json</code></li>
 </ol>
-<p>验证方法学详见 <a href="https://github.com/deepseek-ai/deepseek-harness/discussions/462">官方 Discussion 462</a>。</p>
+<p><strong>为什么要来</strong>：在 awesome 的"待测/未知"海洋里，Verified 徽标让你脱颖而出；验证还会帮你发现真实 bug（<a href="https://github.com/fuhefei/dsh-sentinel/issues/4">dsh-sentinel 案例</a>）。验证方法学详见 <a href="https://github.com/deepseek-ai/deepseek-harness/discussions/462">官方 Discussion 462</a>。</p>
+</div>
+
+<div class="howto">
+<h2>使用者：安装可信插件</h2>
+<p>从上方选一个 ✅ Verified 插件，然后：</p>
+<pre><code>dsh plugin --profile web add &lt;插件包名&gt;</code></pre>
+<p>（安装命令以插件自身 README 为准；Verified 徽标保证它至少通过了运行时审查。）</p>
 </div>
 
 <div class="howto">
@@ -87,7 +94,7 @@
 </div>
 
 <footer>
-社区维护 · 非官方 · <a href="https://github.com/qing3a/dsh-plugin-verify">dsh-plugin-verify</a>
+社区判定 · 非官方 · 与 <a href="https://github.com/AdamPlatin123/awesome-dsh-plugins">awesome-dsh-plugins</a>（观测雷达）互补 · <a href="https://github.com/qing3a/dsh-plugin-verify">dsh-plugin-verify</a>
 </footer>
 </body>
 </html>
