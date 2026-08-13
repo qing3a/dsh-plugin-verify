@@ -3,7 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Verified DSH Plugins — 实测判定的 DSH 插件站</title>
+<title>Verified DSH Plugins — DeepSeek Harness 插件判定站（运行时验证）</title>
+<meta name="description" content="Verified DSH Plugins：DeepSeek Harness 插件判定站。每个插件经过完整运行时验证（7/7 waterfall + tools/result），通过才给 Verified 徽标。投稿你的 DSH 插件，2 分钟上架。" />
+<meta name="keywords" content="DeepSeek Harness, DSH, DSH plugin, verified plugin, 插件验证, 插件市场, dsh-plugin-verify, runtime verification" />
+<meta property="og:title" content="Verified DSH Plugins — DSH 插件判定站" />
+<meta property="og:description" content="只收录通过运行时验证的 DeepSeek Harness 插件。投稿 2 分钟上架。" />
 <style>
   :root { color-scheme: light dark; }
   body { font-family: system-ui, -apple-system, sans-serif; margin: 0 auto; max-width: 900px; padding: 2rem 1.5rem 4rem; line-height: 1.6; }
@@ -55,7 +59,7 @@
 <!-- CTA -->
 <div class="cta">
   <a class="primary" href="#catalog">🔍 找可信插件</a>
-  <a class="secondary" href="#authors">🏅 给插件拿徽标（2 分钟）</a>
+  <a class="secondary" href="#authors">🏅 投稿你的插件（2 分钟上架）</a>
 </div>
 
 <!-- 状态图例 -->
@@ -139,18 +143,20 @@
 </table>
 </details>
 
-<!-- 插件作者 -->
+<!-- 插件作者投稿 -->
 <div class="howto" id="authors">
-<h2>插件作者：拿徽标只要 2 分钟</h2>
+<h2>投稿你的插件（2 分钟上架）</h2>
+<p><strong>这里是一个插件市场，不是一个清单。</strong> 投稿 = 验证 + 上架 = 获得徽标 + 被发现 + 被安装。</p>
 <pre><code>npx dsh-plugin-verify &lt;你的插件路径&gt; --repo &lt;DSH checkout&gt;
 # ✅ 通过 | 捕获事件: 13 | waterfall: 7/7 | tools/result: 是
 </code></pre>
 <ol>
   <li>准备 DSH checkout（<code>build:lib:host && build:lib:client</code>）</li>
-  <li>跑上面的命令 → 通过 → 提 PR/Issue 收录（附 <code>verify-report.json</code>）</li>
-  <li>上架拿徽标</li>
+  <li>跑上面的命令 → 通过</li>
+  <li>提 PR/Issue 投稿（附 <code>verify-report.json</code>，说明插件名/仓库/分类/一句话描述）</li>
+  <li>上架 → 获得徽标，进入分类目录</li>
 </ol>
-<p><strong>为什么要来</strong>：288 个插件的"待测/未知"海洋里，✅ 徽标让你脱颖而出；验证顺带帮你发现真实 bug（<a href="https://github.com/fuhefei/dsh-sentinel/issues/4">dsh-sentinel 案例</a>）。</p>
+<p><strong>为什么要投稿</strong>：288+ 插件的"待测/未知"海洋里，✅ 徽标让你脱颖而出；验证顺带帮你发现真实 bug（<a href="https://github.com/fuhefei/dsh-sentinel/issues/4">dsh-sentinel 案例</a>）；收录进分类目录 → 用户/AI 按功能找你 → 被安装。</p>
 </div>
 
 <!-- 使用者 -->
