@@ -146,6 +146,9 @@ function startMockLlm(repoPath: string): { child: ReturnType<typeof spawn>; port
     ],
     { cwd: repoPath, shell: false, stdio: 'pipe' },
   )
+  // 透传 mock-llm 输出到 stderr 便于诊断（不混入 stdout 的进度输出）
+  child.stdout?.on('data', (d: Buffer) => process.stderr.write(`[mock] ${d.toString()}`))
+  child.stderr?.on('data', (d: Buffer) => process.stderr.write(`[mock] ${d.toString()}`))
   const ready = new Promise<void>((resolveReady, reject) => {
     let buf = ''
     child.stdout?.on('data', (d: Buffer) => {
