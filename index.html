@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Verified DSH Plugins — 通过运行时验证的 DeepSeek Harness 插件</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, -apple-system, sans-serif; margin: 0 auto; max-width: 860px; padding: 2rem 1.5rem 4rem; line-height: 1.6; }
+  h1 { font-size: 1.6rem; margin-bottom: .3rem; }
+  .sub { color: #888; margin-bottom: 2rem; }
+  .badge { display: inline-block; background: #1f8b4c; color: #fff; border-radius: 4px; padding: 1px 7px; font-size: .75rem; font-weight: 600; }
+  .note { background: #00000012; border-left: 3px solid #888; padding: .6rem 1rem; font-size: .9rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+  th, td { border: 1px solid #00000022; padding: .5rem .7rem; text-align: left; vertical-align: top; }
+  th { background: #0000000a; white-space: nowrap; }
+  code { background: #00000014; border-radius: 3px; padding: 0 4px; font-size: .85em; }
+  .howto { margin-top: 2.5rem; }
+  .howto ol { padding-left: 1.3rem; }
+  footer { margin-top: 3rem; color: #999; font-size: .8rem; }
+</style>
+</head>
+<body>
+<h1>Verified DSH Plugins <span class="badge">✓ verified</span></h1>
+<p class="sub">只收录通过 <strong>运行时验证</strong> 的 DeepSeek Harness 插件 —— 由 <a href="https://github.com/qing3a/dsh-plugin-verify">dsh-plugin-verify</a> 实测。</p>
+
+<div class="note">
+<strong>什么是运行时验证：</strong>用 mock-llm 触发完整 agent 循环（tool_call_success → bash 工具调用），检查
+<code>system-prompt/assemble → agent/pre-step → agent/request → llm/stream → tools/pre-execute → tools/execute → tools/post-execute → tools/result</code>
+整条 waterfall 链完整出现、且 agent 正常收尾 —— 证明插件的 waterfall 监听器正确透传了 <code>next()</code>（零副作用）。
+<strong>收录 ≠ 官方背书</strong>；验证基于当日 mainline，DSH 每天更新，插件可能漂移，请自行复核。</div>
+
+<h2>已收录插件</h2>
+<table>
+<thead>
+<tr><th>插件</th><th>仓库</th><th>说明</th><th>验证日期</th><th>验证报告</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>dsh-event-auditor</code></td>
+  <td><a href="https://github.com/qing3a/dsh-event-auditor">qing3a/dsh-event-auditor</a></td>
+  <td>harness 事件流审计面板：观察事件类型/分发模式/计数/最近事件；settings 热改 + /audit 会话命令 + headless dump</td>
+  <td>2026-08-14</td>
+  <td><a href="reports/event-auditor-2026-08-14.json">view</a></td>
+</tr>
+<tr>
+  <td><code>dsh-tray</code></td>
+  <td><a href="https://github.com/qing3a/dsh-tray">qing3a/dsh-tray</a></td>
+  <td>Windows 系统托盘插件（trayicon exe 宿主，无 native 编译）：菜单/通知/headless 降级</td>
+  <td>2026-08-14</td>
+  <td><a href="reports/tray-2026-08-14.json">view</a></td>
+</tr>
+</tbody>
+</table>
+
+<div class="howto">
+<h2>如何验证你的插件（2 分钟）</h2>
+<ol>
+  <li>准备一个 DSH 源码 checkout（<code>pnpm run build:lib:host && build:lib:client</code> 已构建）</li>
+  <li><code>npx dsh-plugin-verify &lt;你的插件路径&gt; --repo &lt;DSH checkout&gt;</code></li>
+  <li>输出 <code>✅ 通过</code> 且 waterfall 7/7 → 你的插件可在本目录收录（提 PR 或 issue）</li>
+</ol>
+<p>验证方法学详见 <a href="https://github.com/deepseek-ai/deepseek-harness/discussions/462">官方 Discussion 462</a>。</p>
+</div>
+
+<footer>
+社区维护 · 非官方 · <a href="https://github.com/qing3a/dsh-plugin-verify">dsh-plugin-verify</a>
+</footer>
+</body>
+</html>

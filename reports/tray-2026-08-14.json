@@ -1,0 +1,17 @@
+{
+  "plugin": "C:\\Users\\Administrator\\Desktop\\ds\\dsh-tray",
+  "repo": "C:\\Users\\Administrator\\Desktop\\ds\\deepseek-harness",
+  "date": "2026-08-13T20:50:06.502Z",
+  "pass": true,
+  "waterfallFound": [
+    "system-prompt/assemble",
+    "agent/pre-step",
+    "agent/request",
+    "llm/stream",
+    "tools/pre-execute",
+    "tools/execute",
+    "tools/post-execute"
+  ],
+  "waterfallMissing": [],
+  "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是"
+}
