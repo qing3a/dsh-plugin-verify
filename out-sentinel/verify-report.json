@@ -1,0 +1,18 @@
+{
+  "plugin": "C:\\Users\\Administrator\\Desktop\\ds\\dsh-sentinel",
+  "repo": "C:\\Users\\Administrator\\Desktop\\ds\\deepseek-harness",
+  "date": "2026-08-13T21:11:40.192Z",
+  "pass": false,
+  "waterfallFound": [
+    "system-prompt/assemble"
+  ],
+  "waterfallMissing": [
+    "agent/pre-step",
+    "agent/request",
+    "llm/stream",
+    "tools/pre-execute",
+    "tools/execute",
+    "tools/post-execute"
+  ],
+  "detail": "捕获事件: 1 | waterfall: 1/7 | tools/result: 否"
+}
