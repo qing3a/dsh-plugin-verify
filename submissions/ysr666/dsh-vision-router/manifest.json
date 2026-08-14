@@ -1,0 +1,19 @@
+{
+  "schema": "dsh-plugin-submission/v1",
+  "plugin": {
+    "name": "dsh-vision-router",
+    "repo": "ysr666/dsh-vision-router",
+    "category": "调试与观测",
+    "description": "为纯文本 Agent 提供视觉能力：内置免 Key 视觉链 + 像素级视觉工具，粘贴图片即可用",
+    "version": "0.2.0"
+  },
+  "verification": {
+    "report": "verify-report.json",
+    "date": "2026-08-14",
+    "pass": true
+  },
+  "files": {
+    "verify-report.json": "f8dbcf934e1777d4d4cd8c78da7c872954cde8ea761ca2f2a3cc056cf594bb22",
+    "self_check.json": "fc955b6d23181240a955c948e9da2e970b86b047c8774543d3b87602f0d79b9e"
+  }
+}
