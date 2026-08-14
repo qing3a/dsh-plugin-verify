@@ -2,7 +2,7 @@
 
 > DSH 插件**判定站**：每个插件经过同一套运行时验证（7/7 waterfall + tools/result），通过才给 ✅ Verified 徽标。**与 awesome-dsh-plugins（全量分级观测）互补：它做 L0-L4 全量观测分级，我们把 L4 运行实测做深（7/7 waterfall + tools/result）。**
 
-![verified](https://img.shields.io/badge/Verified%20插件-4-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
+![verified](https://img.shields.io/badge/Verified%20插件-6-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
 
 - **找可信插件**：按功能分类浏览，每个插件带 Verified 徽标 + 验证日期 + 可复现报告——证据可复现的运行时验证（7/7 waterfall + tools/result）
 - **装得放心**：徽标 = 通过了完整 agent 循环审查；附带安装指引与安全提示
@@ -77,6 +77,7 @@
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
+| [dsh-repo-context](https://github.com/qing3a/dsh-repo-context) | ✅ | 把 git 状态与仓库规范动态注入 system prompt（section/context/variable，官方缝隙插件） | 2026-08-14 | [view](reports/repo-context-2026-08-14.json) |
 | [falsify-dsh](https://github.com/shi275773124/falsify-dsh) | ✅ | Falsify CLI 适配器：裁决收据（lint / review --json / gate） | 2026-08-14 | [view](reports/falsify-2026-08-14.json) |
 
 > 你的插件还没在？[拿徽标只要 2 分钟](#插件作者如何获得-verified-徽标)。
