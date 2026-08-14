@@ -34,7 +34,7 @@
 ```
 
 - **headless profile**：`dsh --profile headless "prompt"`，无 UI 的 agent 循环，命令行直喂
-- **mock-llm**（`@deepseek-ai/dsh-llm-mock-server`）：OpenAI 兼容的脚本化服务器，按 `--sequence` FIFO 返回预设行为。`tool_call_success` 让模型"调用 bash 工具"——这一步是整个方案的关键，它触发 `tools/pre-execute → execute → post-execute` 全链
+- **mock-llm**（`@deepseek-ai/dsh-llm-mock-server`）：OpenAI 兼容的脚本化服务器，按 `--sequence` FIFO 返回预设行为。`tool_call_success` 让模型"调用平台 shell 工具"（**Windows 用 `pwsh`、非 Windows 用 `bash`**——DSH 按平台启停 shell，见下文"平台边界"）——这一步是整个方案的关键，它触发 `tools/pre-execute → execute → post-execute` 全链
 - **DSH_EVENT_AUDIT_DUMP**：dsh-event-auditor 提供的环境变量——进程 `exit` 时把事件审计快照同步写盘（headless 没有 webServer，这是无 HTTP 场景的审计出口）
 
 ## 三、完整命令（一步步来）
@@ -78,15 +78,22 @@ ctx.inject(['webServer'], (sctx) => {
 ### 3.4 启动 mock-llm
 
 ```sh
+# Windows：正确工具是 pwsh（DSH 按平台启停 shell，Windows 上 bash 未注册）
 pnpm run mock:llm --port 8000 --api-key mock-key \
   --sequence tool_call_success,success --repeat-last \
-  --tool-name bash --tool-arguments '{"command":"ls"}'
+  --tool-name pwsh --tool-arguments '{"command":"echo ok","description":"verify tool execution"}'
+# 非 Windows：bash
+pnpm run mock:llm --port 8000 --api-key mock-key \
+  --sequence tool_call_success,success --repeat-last \
+  --tool-name bash --tool-arguments '{"command":"echo ok","description":"verify tool execution"}'
 ```
 
 三个要点：
-- `tool_call_success`：第一个请求返回"调用 bash 工具"（`--tool-name bash --tool-arguments '{"command":"ls"}'` 指定）
+- `tool_call_success`：第一个请求返回"调用平台 shell 工具"（`--tool-name` + `--tool-arguments` 指定）
 - `success`：第二个请求正常回复（工具结果之后模型要收尾）
 - `--repeat-last`：序列耗尽后复用最后一项，防止超长对话 500
+
+**⚠️ 平台边界（实测踩坑）**：`tool-bash` 在 Windows 被官方禁用（`disabled: !!js process.platform === 'win32'`，见 `packages/bundle/base/cordis.patch.yml`），用 bash 触发会得到 `UNKNOWN_TOOL`——waterfall 链照走、`mock response recovered` 照出，但工具从未真实执行。**工具参数必须含 `description`**（tool-bash/tool-pwsh 的校验都要求 command + description，缺了抛 `INVALID_ARGS`）。这两个都是"空转"——验证必须查 dump 的 `tools/result` payload 是不是 `isError:false`，不能只看 recovered。
 
 **⚠️ 坑**：`pnpm run mock:llm -- --port ...` 会报 `Unexpected argument '--port'`——`--` 会被当成位置参数传给 bin.ts，必须直接 `pnpm run mock:llm --port ...`。
 
@@ -96,10 +103,10 @@ pnpm run mock:llm --port 8000 --api-key mock-key \
 DEEPSEEK_BASE_URL=http://127.0.0.1:8000/v1 \
 DEEPSEEK_API_KEY=mock-key \
 DSH_EVENT_AUDIT_DUMP=/tmp/audit.json \
-pnpm dsh --profile headless "run the bash tool once and report"
+pnpm dsh --profile headless "run the pwsh tool once and report"   # Windows；非 Windows 用 bash
 ```
 
-正常结束的标志：输出 `mock response recovered`——agent 完整跑完了一轮（工具调用 + 结果回收 + 模型收尾）。
+`mock response recovered` 只表示 agent 完整跑完一轮；**工具是否真实执行成功看 dump 里 `tools/result` 的 `isError`**。
 
 ## 四、什么算"通过"：五条验证标准
 
