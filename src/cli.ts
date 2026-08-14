@@ -128,6 +128,26 @@ function removePlugin(repoPath: string, pluginPath: string): void {
   }
 }
 
+/** 验证后自清理 verify-auditor 自身。
+ * ⚠️ 必须做：auditor 每次都会被 link 进 headless profile，若不清理会残留；
+ *    下次（可能来自不同安装路径的 CLI）再 add 同名 auditor → duplicate entry id。 */
+function removeAuditor(repoPath: string): void {
+  try {
+    const abs = join(__dirname, '..', 'auditor')
+    const pkg = JSON.parse(readFileSync(join(abs, 'package.json'), 'utf8')) as { name?: string }
+    if (!pkg.name) return
+    const res = run('pnpm', ['dsh', 'plugin', '--profile', 'headless', 'remove', pkg.name], {
+      cwd: repoPath,
+      timeoutMs: 120_000,
+    })
+    if (res.code !== 0) {
+      process.stderr.write(`[warn] auditor 自清理失败（${pkg.name}）: ${res.stdout.slice(-200)}\n`)
+    }
+  } catch {
+    // 自清理失败不阻塞验证结论
+  }
+}
+
 /** 启动 mock-llm，返回句柄。用 node 直跑 bin.ts（避免 shell:true 拼参数破坏 JSON 引号） */
 function startMockLlm(repoPath: string): { child: ReturnType<typeof spawn>; port: number; ready: Promise<void> } {
   const port = 8000
@@ -255,7 +275,8 @@ export async function main(): Promise<number> {
       return result.pass ? 0 : 1
     } finally {
       killTree(mock.child)
-      removePlugin(args.repoPath, args.pluginPath)  // 自清理，防残留阻塞
+      removePlugin(args.repoPath, args.pluginPath)  // 自清理目标插件，防残留阻塞
+      removeAuditor(args.repoPath)                  // 自清理 auditor 自身，防重复 id
     }
   } catch (err) {
     console.error(`✗ ${(err as Error).message}`)
