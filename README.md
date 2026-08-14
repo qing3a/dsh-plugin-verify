@@ -1,10 +1,10 @@
 # dsh-plugin-verify — Verified DSH Plugins
 
-> DSH 插件**判定站**：每个插件经过同一套运行时验证（7/7 waterfall + tools/result），通过才给 ✅ Verified 徽标。**与 awesome-dsh-plugins（全量观测）互补：它观测一切，我们做实测定判。**
+> DSH 插件**判定站**：每个插件经过同一套运行时验证（7/7 waterfall + tools/result），通过才给 ✅ Verified 徽标。**与 awesome-dsh-plugins（全量分级观测）互补：它做 L0-L4 全量观测分级，我们把 L4 运行实测做深（7/7 waterfall + tools/result）。**
 
 ![verified](https://img.shields.io/badge/Verified%20插件-4-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
 
-- **找可信插件**：按功能分类浏览，每个插件带 Verified 徽标 + 验证日期 + 可复现报告——不是嘴上说"能用"，是实测过"零副作用"
+- **找可信插件**：按功能分类浏览，每个插件带 Verified 徽标 + 验证日期 + 可复现报告——证据可复现的运行时验证（7/7 waterfall + tools/result）
 - **装得放心**：徽标 = 通过了完整 agent 循环审查；附带安装指引与安全提示
 - **给插件做判定**：插件作者一条命令跑验证拿徽标；顺带帮你发现真实 bug
 
@@ -61,7 +61,7 @@
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
-| [dsh-security-scan](https://github.com/ben7am1n/dsh-security-scan) | ✅ | Secret & dangerous-pattern scanner（zero deps）——首个通过的外部插件 | 2026-08-14 | [view](reports/security-scan-2026-08-14.json) |
+| [dsh-security-scan](https://github.com/ben7am1n/dsh-security-scan) | ✅ | Secret & dangerous-pattern scanner（zero deps） | 2026-08-14 | [view](reports/security-scan-2026-08-14.json) |
 
 ### 📊 效率与监控（Productivity & Monitoring）
 
@@ -77,7 +77,7 @@
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
-| [falsify-dsh](https://github.com/shi275773124/falsify-dsh) | ✅ | Falsify CLI 适配器：裁决收据（lint / review --json / gate）——第 4 个验证的外部插件 | 2026-08-14 | [view](reports/falsify-2026-08-14.json) |
+| [falsify-dsh](https://github.com/shi275773124/falsify-dsh) | ✅ | Falsify CLI 适配器：裁决收据（lint / review --json / gate） | 2026-08-14 | [view](reports/falsify-2026-08-14.json) |
 
 > 你的插件还没在？[拿徽标只要 2 分钟](#插件作者如何获得-verified-徽标)。
 
@@ -92,21 +92,27 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 → tools/pre-execute → tools/execute → tools/post-execute → tools/result
 ```
 
-**通过标准**：7/7 waterfall 链完整 + `tools/result` 收尾 = 插件零副作用（所有 waterfall 监听器正确透传 `next()`）。
+**通过标准**：7/7 waterfall 链完整 + `tools/result` 收尾（零副作用）+ **R3**（`tools/result` 不出现 `UNKNOWN_TOOL`——工具缺失必须判失败，官方 postmortem 0002 教训）。
 
 **报告怎么读**（`verify-report.json`）：
 
 ```json
-{ "pass": true, "waterfallFound": [7/7 事件], "waterfallMissing": [], "detail": "捕获事件: 13 | tools/result: 是" }
+{ "pass": true, "waterfallFound": [7/7 事件], "waterfallMissing": [],
+  "rules": [{"name":"R1-entry-shape","pass":true,...},{"name":"R2-patch-yaml","pass":true,...},{"name":"R3-tools-result","pass":true,...}],
+  "detail": "捕获事件: 13 | tools/result: 是" }
 ```
 
-- `pass: true` + `missing: []` = ✅ 通过
+- `pass: true` + `missing: []` + `rules[]` 全 `pass` = ✅ 通过
 - `missing` 列出哪段链没出现 → 定位插件哪个 waterfall 监听器有问题
+- `rules[]`：R1（入口形态，postmortem 0001 unwrapExports 陷阱）、R2（`!!js` 只在 config 子树，postmortem 0002）、R3（`UNKNOWN_TOOL` 运行时判失败，postmortem 0002 快照教训）——静态规则是确定性信号，最终以运行时判定为准
 - 每份报告含插件路径、DSH checkout、日期 → 可复现
+- 人工评审层：`docs/review-checklist.md`（官方 defensive-patterns 7 条 + postmortem 检查点）
 
 ## 插件作者：投稿你的插件（2 分钟上架）
 
 **这里是一个插件市场，不是一个清单。** 投稿 = 验证 + 上架 = 获得徽标 + 被发现 + 被安装。
+
+> 📐 生态尚无官方插件规范——判定站配套了[《DSH 插件开发与设计规范建议 v0.1》](docs/plugin-standards.md)（基于官方源码分析与官方风格提炼，每条带依据与踩坑记录，避免重复试错）。投稿 = 声明符合规范建议 + 通过判定。
 
 ```bash
 # 1. 准备 DSH checkout（已 build:lib:host && build:lib:client）
@@ -125,7 +131,7 @@ npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
 **为什么要投稿**：
 - 在 288+ 个插件的"待测/未知"海洋里，✅ 徽标让你**脱颖而出**
 - 验证会**帮你发现真实 bug**（[dsh-sentinel 案例](https://github.com/fuhefei/dsh-sentinel/issues/4)：headless 加载失败被验证工具抓出）
-- 报告可直接作为 [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 登记 PR 的运行实测证据
+- 报告可直接作为 [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 登记 PR 的运行实测证据（其 L4 层）
 - 收录进分类目录 → 用户/AI 按功能找你 → 被安装
 
 **收录条件**：公开仓库 + `dsh-plugin` topic + 合法 package.json + 运行时依赖声明 + 许可证 + README（含安装/卸载/最小示例）。命名用你有权控制的 scope，不占 `@deepseek-ai/*` 保留命名空间。
@@ -149,7 +155,7 @@ npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
 ## 边界与免责
 
 - **徽标 ≠ 官方背书** ≠ 完整功能测试 ≠ 安全审计；只证明"在记录的环境与 commit 上通过了运行时审查"
-- **与 [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 的关系**：它是全量观测雷达（288 仓库、静态判定），我们做实测定判定——**互为补充：它给全量信号，我们给可信结论**，读者可互跳
+- **与 [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 的关系**：它做全量分级观测（L0 发现 → L1 清单 → L2 静态兼容 → L3 编译 → L4 运行实测，288 仓库）；我们聚焦 **L4 运行实测并做深**（7/7 waterfall + tools/result 零副作用）——**互补：它给全量分级信号，我们给深度可信结论**，读者可互跳
 
 ## 文章
 
