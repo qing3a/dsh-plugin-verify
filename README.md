@@ -85,14 +85,14 @@
 
 **为什么是运行时判定**：静态检查只能证明"能加载"，证明不了"不破坏行为"。waterfall 监听器漏调 `next()` 会静默吞掉 agent 的默认行为——这类 bug 只有真实循环才暴露。
 
-**判定流程**（mock-llm 触发完整 agent 循环，tool_call_success → bash 工具调用）：
+**判定流程**（mock-llm 触发完整 agent 循环，`tool_call_success` → 平台 shell 工具调用——Windows 用 `pwsh`、非 Windows 用 `bash`，见 `docs/runtime-validation.md` 平台边界）：
 
 ```
 system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 → tools/pre-execute → tools/execute → tools/post-execute → tools/result
 ```
 
-**通过标准**：7/7 waterfall 链完整 + `tools/result` 收尾（零副作用）+ **R3**（`tools/result` 不出现 `UNKNOWN_TOOL`——工具缺失必须判失败，官方 postmortem 0002 教训）。
+**通过标准**：7/7 waterfall 链完整 + `tools/result` 收尾（零副作用）+ **R3**（目标工具真实执行成功——`tools/result` 载荷 `isError:false`；目标工具本身 `UNKNOWN_TOOL` 判失败，postmortem 0002 教训）。
 
 **报告怎么读**（`verify-report.json`）：
 

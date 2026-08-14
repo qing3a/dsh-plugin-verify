@@ -153,9 +153,18 @@ function removeAuditor(repoPath: string): void {
   }
 }
 
-/** 启动 mock-llm，返回句柄。用 node 直跑 bin.ts（避免 shell:true 拼参数破坏 JSON 引号） */
-function startMockLlm(repoPath: string): { child: ReturnType<typeof spawn>; port: number; ready: Promise<void> } {
+/** 启动 mock-llm，返回句柄。用 node 直跑 bin.ts（避免 shell:true 拼参数破坏 JSON 引号）。
+ * ⚠️ 平台边界（2026-08-14 实测，读 base/cordis.patch.yml）：DSH 按平台启停 shell——
+ *   Windows 上 `tool-bash disabled: !!js process.platform === 'win32'`（bash 未注册），
+ *   正确工具是 `pwsh`；非 Windows 才是 bash。mock 触发工具必须平台感知，
+ *   否则 UNKNOWN_TOOL/INVALID_ARGS 空转循环（旧验证从未真实触发工具执行）。
+ *   ⚠️ 工具参数必须含 `description`（tool-bash/tool-pwsh 的 validateBashArgs/PwshToolArgs
+ *   都要求 command + description，缺 description 抛 INVALID_ARGS）。 */
+function startMockLlm(repoPath: string): { child: ReturnType<typeof spawn>; port: number; ready: Promise<void>; toolName: string } {
   const port = 8000
+  const isWin = process.platform === 'win32'
+  const toolName = isWin ? 'pwsh' : 'bash'
+  const toolArgs = JSON.stringify({ command: 'echo ok', description: 'verify tool execution' })
   const child = spawn(
     process.execPath,
     [
@@ -166,8 +175,8 @@ function startMockLlm(repoPath: string): { child: ReturnType<typeof spawn>; port
       '--api-key', 'mock-key',
       '--sequence', 'tool_call_success,success',
       '--repeat-last',
-      '--tool-name', 'bash',
-      '--tool-arguments', '{"command":"ls"}',
+      '--tool-name', toolName,
+      '--tool-arguments', toolArgs,
     ],
     { cwd: repoPath, shell: false, stdio: 'pipe' },
   )
@@ -191,7 +200,7 @@ function startMockLlm(repoPath: string): { child: ReturnType<typeof spawn>; port
     // 30s 兜底（若仍无 ready 由调用方在 headless 失败时诊断）
     setTimeout(() => resolveReady(), 30_000)
   })
-  return { child, port, ready }
+  return { child, port, ready, toolName }
 }
 
 /** Windows 下杀整棵进程树（pnpm run 会 spawn 子 node），避免孤儿占端口 */
@@ -235,8 +244,12 @@ interface AnalyzeResult {
   rules: RuntimeRuleResult[]
 }
 
-/** 解析 dump：检查 waterfall 链完整 + agent 收尾 + 工具失败语义（R3） */
-export function analyze(dumpPath: string): AnalyzeResult {
+/** 解析 dump：检查 waterfall 链完整 + agent 收尾 + 工具执行语义（R3）。
+ * @param targetToolName mock 触发/期望执行的目标工具名（win=pwsh 否则 bash，
+ *   与 startMockLlm 一致）——R3 用它区分"平台预期失败"与"插件破坏工具注册"：
+ *   目标工具本身 UNKNOWN_TOOL = 工具链被破坏（postmortem 0002 场景）→ 判失败；
+ *   其他 isError（INVALID_ARGS/sandbox denied 等）→ 记录不判失败（参数/平台/策略相关）。 */
+export function analyze(dumpPath: string, targetToolName?: string): AnalyzeResult {
   if (!existsSync(dumpPath)) {
     return {
       pass: false,
@@ -255,23 +268,25 @@ export function analyze(dumpPath: string): AnalyzeResult {
   const hasResult = foundSet.has('tools/result')
   const detail = `捕获事件: ${raw.records.length} | waterfall: ${found.length}/${WATERFALL_CHAIN.length} | tools/result: ${hasResult ? '是' : '否'}`
 
-  // R3：tools/result 载荷语义——工具缺失会以 isError + code=UNKNOWN_TOOL 出现
-  // （postmortem 0002：快照刷新会把 UNKNOWN_TOOL 当成新期望输出提交，语义断言必须查 code）
+  // R3：tools/result 载荷语义。postmortem 0002 教训：工具缺失以 UNKNOWN_TOOL 出现，
+  // 必须语义断言。但平台边界（base/cordis.patch.yml 按平台启停 shell）会让
+  // "非目标平台工具" UNKNOWN_TOOL 成为预期——只有**目标工具本身**未注册才是插件/组合破坏。
   const toolResults = raw.records.filter((r) => r.event === 'tools/result')
-  const unknownTool = toolResults.filter((r) => r.payload?.isError && r.payload.code === 'UNKNOWN_TOOL')
-  const unknownToolDetail =
-    unknownTool.length > 0
-      ? `tools/result 出现 ${unknownTool.length} 次 UNKNOWN_TOOL（${unknownTool[0]?.payload?.message ?? '无 message'}）——请求了未注册工具（postmortem 0002 教训）`
-      : `tools/result 无 UNKNOWN_TOOL（${toolResults.length} 次结果${toolResults.some((r) => r.payload?.isError) ? '，存在其他 isError 结果' : '，全部成功'}）`
+  const targetBlocked = targetToolName !== undefined
+    && toolResults.some((r) => r.payload?.isError
+      && r.payload.code === 'UNKNOWN_TOOL'
+      && (r.payload.message ?? '').includes(targetToolName))
+  const firstErr = toolResults.find((r) => r.payload?.isError)
+  const r3Detail = targetBlocked
+    ? `目标工具 ${targetToolName} 未注册（UNKNOWN_TOOL）——工具链被插件/组合破坏（postmortem 0002 教训）`
+    : firstErr
+      ? `工具已触发（目标 ${targetToolName ?? '未知'}）：${firstErr.payload?.code}（${firstErr.payload?.message}）——平台/参数/策略相关，不判失败`
+      : `工具真实执行成功（${toolResults.length} 次结果，无 isError）`
 
   const rules: RuntimeRuleResult[] = [
-    {
-      name: 'R3-tools-result',
-      pass: unknownTool.length === 0,
-      detail: unknownToolDetail,
-    },
+    { name: 'R3-tools-result', pass: !targetBlocked, detail: r3Detail },
   ]
-  return { pass: missing.length === 0 && hasResult && unknownTool.length === 0, found, missing, detail, rules }
+  return { pass: missing.length === 0 && hasResult && !targetBlocked, found, missing, detail, rules }
 }
 
 export async function main(): Promise<number> {
@@ -309,7 +324,7 @@ export async function main(): Promise<number> {
       const output = runHeadless(args.repoPath, args.dumpPath)
       if (args.verbose) console.log(output)
       console.log('[5/5] 分析事件审计')
-      const result = analyze(args.dumpPath)
+      const result = analyze(args.dumpPath, mock.toolName)
 
       const report = {
         plugin: args.pluginPath,
