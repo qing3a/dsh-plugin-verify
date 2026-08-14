@@ -1,6 +1,6 @@
 node_modules/
 lib/
 out/
-out-tray/
+out-*/
 *.log
 .DS_Store
