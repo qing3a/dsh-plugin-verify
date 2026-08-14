@@ -1,0 +1,10 @@
+{
+  "records": [
+    {
+      "event": "system-prompt/assemble",
+      "mode": "waterfall",
+      "at": 1786655539598,
+      "seq": 0
+    }
+  ]
+}
