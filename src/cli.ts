@@ -1,18 +1,21 @@
 /**
  * dsh-plugin-verify — CLI 入口。
- * 验证流程（封装 2026-08-14 已实证的方法论）：
+ * 验证流程（封装 2026-08-14 已实证的方法论 + 官方 postmortem 规则）：
+ *  0. 静态规则（scripts/static-rules.mjs）：R1 入口形态（0001 unwrapExports）、
+ *     R2 patch YAML（0002 !!js 位置）——确定性信号，不阻塞运行时判定
  *  1. 定位 DSH checkout（--repo 或 DSH_REPO 环境变量）
  *  2. 把待验证插件 link 进 headless profile
  *  3. 启动 mock-llm（tool_call_success 触发工具调用）
- *  4. 用 --patch 注入 verify-auditor + DSH_EVENT_AUDIT_DUMP 跑 headless agent
- *  5. 解析 dump：检查 waterfall 链完整 + agent 收尾（零副作用证明）
+ *  4. 用 --patch 注入 verify-auditor + DSH_VERIFY_DUMP 跑 headless agent
+ *  5. 解析 dump：waterfall 链完整 + agent 收尾 + R3 tools/result 语义
+ *     （UNKNOWN_TOOL 判失败，postmortem 0002 快照教训）
  *  6. 输出报告（JSON + 人类可读），退出码 0=通过 1=未通过 2=环境错误
  */
 
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const __dirname = resolve(fileURLToPath(new URL('.', import.meta.url)))
 
@@ -61,7 +64,9 @@ function parseArgs(argv: readonly string[]): CliArgs {
   if (!repoPath) {
     throw new Error('未指定 DSH checkout：用 --repo 或 DSH_REPO 环境变量')
   }
-  return { pluginPath, repoPath, outDir, dumpPath: join(outDir, 'verify-dump.json'), verbose }
+  // ⚠️ dumpPath 必须绝对路径：auditor 在 headless 子进程里写文件，相对路径会随
+  // 子进程 cwd（profile 目录/checkout）漂移导致 dump 写丢（2026-08-14 实测踩到）
+  return { pluginPath, repoPath, outDir, dumpPath: resolve(outDir, 'verify-dump.json'), verbose }
 }
 
 function run(cmd: string, args: string[], opts: { cwd?: string; env?: Record<string, string>; timeoutMs?: number } = {}): { code: number; stdout: string } {
@@ -216,18 +221,57 @@ function runHeadless(repoPath: string, dumpPath: string): string {
   return res.stdout
 }
 
-/** 解析 dump：检查 waterfall 链完整 + agent 收尾 */
-function analyze(dumpPath: string): { pass: boolean; found: string[]; missing: string[]; detail: string } {
+interface RuntimeRuleResult {
+  name: string
+  pass: boolean
+  detail: string
+}
+
+interface AnalyzeResult {
+  pass: boolean
+  found: string[]
+  missing: string[]
+  detail: string
+  rules: RuntimeRuleResult[]
+}
+
+/** 解析 dump：检查 waterfall 链完整 + agent 收尾 + 工具失败语义（R3） */
+export function analyze(dumpPath: string): AnalyzeResult {
   if (!existsSync(dumpPath)) {
-    return { pass: false, found: [], missing: WATERFALL_CHAIN.map(([n]) => n), detail: 'dump 文件不存在' }
+    return {
+      pass: false,
+      found: [],
+      missing: WATERFALL_CHAIN.map(([n]) => n),
+      detail: 'dump 文件不存在',
+      rules: [{ name: 'R3-tools-result', pass: false, detail: '无 dump 可检查' }],
+    }
   }
-  const raw = JSON.parse(readFileSync(dumpPath, 'utf8')) as { records: Array<{ event: string }> }
+  const raw = JSON.parse(readFileSync(dumpPath, 'utf8')) as {
+    records: Array<{ event: string; payload?: { isError: boolean; code?: string; message?: string } }>
+  }
   const foundSet = new Set(raw.records.map((r) => r.event))
   const missing = WATERFALL_CHAIN.map(([n]) => n).filter((n) => !foundSet.has(n))
   const found = WATERFALL_CHAIN.map(([n]) => n).filter((n) => foundSet.has(n))
   const hasResult = foundSet.has('tools/result')
   const detail = `捕获事件: ${raw.records.length} | waterfall: ${found.length}/${WATERFALL_CHAIN.length} | tools/result: ${hasResult ? '是' : '否'}`
-  return { pass: missing.length === 0 && hasResult, found, missing, detail }
+
+  // R3：tools/result 载荷语义——工具缺失会以 isError + code=UNKNOWN_TOOL 出现
+  // （postmortem 0002：快照刷新会把 UNKNOWN_TOOL 当成新期望输出提交，语义断言必须查 code）
+  const toolResults = raw.records.filter((r) => r.event === 'tools/result')
+  const unknownTool = toolResults.filter((r) => r.payload?.isError && r.payload.code === 'UNKNOWN_TOOL')
+  const unknownToolDetail =
+    unknownTool.length > 0
+      ? `tools/result 出现 ${unknownTool.length} 次 UNKNOWN_TOOL（${unknownTool[0]?.payload?.message ?? '无 message'}）——请求了未注册工具（postmortem 0002 教训）`
+      : `tools/result 无 UNKNOWN_TOOL（${toolResults.length} 次结果${toolResults.some((r) => r.payload?.isError) ? '，存在其他 isError 结果' : '，全部成功'}）`
+
+  const rules: RuntimeRuleResult[] = [
+    {
+      name: 'R3-tools-result',
+      pass: unknownTool.length === 0,
+      detail: unknownToolDetail,
+    },
+  ]
+  return { pass: missing.length === 0 && hasResult && unknownTool.length === 0, found, missing, detail, rules }
 }
 
 export async function main(): Promise<number> {
@@ -242,6 +286,15 @@ export async function main(): Promise<number> {
   mkdirSync(args.outDir, { recursive: true })
 
   try {
+    // 静态规则（postmortem 0001/0002 驱动）：确定性信号，不阻塞运行时判定
+    const staticModule = await import(
+      pathToFileURL(join(__dirname, '..', 'scripts', 'static-rules.mjs')).href
+    ) as { runStaticRules: (dir: string) => { rules: Array<{ name: string; pass: boolean; detail: string }> } }
+    const staticResult = staticModule.runStaticRules(args.pluginPath)
+    for (const r of staticResult.rules) {
+      console.log(`  ${r.pass ? '✓' : '✗'} ${r.name}: ${r.detail}`)
+    }
+
     console.log(`[1/5] 前置检查 DSH checkout: ${args.repoPath}`)
     preflight(args.repoPath)
     console.log(`[2/5] 安装插件 + verify-auditor 到 headless profile`)
@@ -265,6 +318,7 @@ export async function main(): Promise<number> {
         pass: result.pass,
         waterfallFound: result.found,
         waterfallMissing: result.missing,
+        rules: [...staticResult.rules, ...result.rules],
         detail: result.detail,
       }
       const reportFile = join(args.outDir, 'verify-report.json')

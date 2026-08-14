@@ -38,6 +38,8 @@ interface AuditRecord {
   mode: string
   at: number
   seq: number
+  /** tools/result 载荷摘要（仅 isError/code/message，防大对象撑爆 dump） */
+  payload?: { isError: boolean; code?: string; message?: string }
 }
 
 function watch(ctx: Context, event: string, handler: (...args: unknown[]) => void): () => void {
@@ -77,8 +79,23 @@ export function apply(ctx: Context): void {
   }
 
   // agent 收尾信号（非 waterfall，仅确认循环真正走完）
-  const disposeResult = watch(ctx, 'tools/result', () => {
-    records.push({ event: 'tools/result', mode: 'emit', at: Date.now(), seq: seq++ })
+  // 载荷摘要：tools/result(exec, result)，result.isError + error.info.code/message
+  // （ToolNotFoundError 的 code === 'UNKNOWN_TOOL'——postmortem 0002 快照教训：
+  //  工具缺失会以 UNKNOWN_TOOL 形式出现，必须在运行时判失败，不能只比对输出）
+  const disposeResult = watch(ctx, 'tools/result', (_exec, result) => {
+    const r = (result ?? {}) as {
+      isError?: boolean
+      error?: { info?: { code?: string }; message?: string }
+    }
+    const rec: AuditRecord = { event: 'tools/result', mode: 'emit', at: Date.now(), seq: seq++ }
+    if (typeof r.isError === 'boolean') {
+      rec.payload = {
+        isError: r.isError,
+        code: r.isError ? (r.error?.info?.code ?? undefined) : undefined,
+        message: r.isError ? r.error?.message : undefined,
+      }
+    }
+    records.push(rec)
   })
   ctx.effect(() => disposeResult, 'verify-auditor: watch tools/result')
 
