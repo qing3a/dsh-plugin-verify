@@ -5,6 +5,10 @@
 > 与自动验证的关系：dsh-plugin-verify 的静态规则（R1/R2）与运行时规则（R3/waterfall）是
 > **机器确定性 gate**；本表是**人类评审层**——自动验证只能算"信号"，不能宣称官方背书。
 > 逐条核对后把结论写进验证报告的 `detail` 或评审笔记。
+> **规则索引**：本文 A–I 是人工评审基表；[review-standards.md](review-standards.md) 是全部规则的
+> 统一索引（P-1xx~6xx 插件必检 / D-1xx dsh-desktop 基线 / C 集官方贡献），本文未覆盖项
+> （如 P-201 资源清理经 ctx.effect、P-203 输出卫生官方正则、P-401 single 槽红线、P-301 数据走
+> storageDomain）以该文档为准。
 
 ## A. 入口与加载（postmortem 0001）
 
