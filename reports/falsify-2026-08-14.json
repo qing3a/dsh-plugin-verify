@@ -1,7 +1,7 @@
 {
-  "plugin": "C:\\Users\\Administrator\\Desktop\\ds\\dsh-falsify",
-  "repo": "C:\\Users\\Administrator\\Desktop\\ds\\deepseek-harness",
-  "date": "2026-08-14T00:29:12.701Z",
+  "plugin": "C:/Users/Administrator/Desktop/ds/dsh-falsify",
+  "repo": "C:/Users/Administrator/Desktop/ds/deepseek-harness",
+  "date": "2026-08-14T07:13:18.443Z",
   "pass": true,
   "waterfallFound": [
     "system-prompt/assemble",
@@ -13,5 +13,22 @@
     "tools/post-execute"
   ],
   "waterfallMissing": [],
+  "rules": [
+    {
+      "name": "R1-entry-shape",
+      "pass": true,
+      "detail": "入口 C:\\Users\\Administrator\\Desktop\\ds\\dsh-falsify\\src\\index.ts：namespace 形式 ✓ 且无裸 export default"
+    },
+    {
+      "name": "R2-patch-yaml",
+      "pass": true,
+      "detail": "patch ./cordis.patch.yml：!!js 表达式均位于 config 子树（9 行）"
+    },
+    {
+      "name": "R3-tools-result",
+      "pass": true,
+      "detail": "工具真实执行成功（1 次结果，无 isError）"
+    }
+  ],
   "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是"
 }
