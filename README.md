@@ -168,3 +168,4 @@ cd auditor && pnpm install && npx tsc -p tsconfig.json   # 审计器
 ## 许可
 
 MIT
+- [把方法论变成一条命令：dsh-plugin-verify 从零到跑通（四）](posts/04-dsh-plugin-verify从零到跑通.md)
