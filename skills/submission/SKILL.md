@@ -8,7 +8,7 @@
 
 Verified DSH Plugins 是 DeepSeek Harness 插件的**判定站**：每个插件经过完整运行时验证（7/7 waterfall + tools/result）才收录。投稿 = 验证 + 上架 = 获得 ✅ Verified 徽标 + 被发现 + 被安装。
 
-**收录前提（硬门槛）**：你的插件必须通过 [dsh-plugin-verify](https://github.com/qing3a/dsh-plugin-verify) 的运行时验证（`✅ 通过 | waterfall: 7/7 | tools/result: 是`）。
+**收录前提（硬门槛）**：你的插件必须通过 [dsh-plugin-verify](https://github.com/qing3a/dsh-plugin-verify) 的运行时验证（`✅ 通过 | waterfall: 7/7 | tools/result: 是`），并声明符合[《DSH 插件开发与设计规范建议 v0.1》](../../docs/plugin-standards.md)（基于官方源码分析与官方风格提炼，含入口/配置红线、生命周期、交互、验证、发布约定）。
 
 ## 二、参与流程（6 步）
 
