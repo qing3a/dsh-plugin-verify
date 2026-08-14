@@ -1,0 +1,17 @@
+{
+  "plugin": "C:\\Users\\Administrator\\Desktop\\ds\\dsh-balance",
+  "repo": "C:\\Users\\Administrator\\Desktop\\ds\\deepseek-harness",
+  "date": "2026-08-14T00:02:17.084Z",
+  "pass": false,
+  "waterfallFound": [],
+  "waterfallMissing": [
+    "system-prompt/assemble",
+    "agent/pre-step",
+    "agent/request",
+    "llm/stream",
+    "tools/pre-execute",
+    "tools/execute",
+    "tools/post-execute"
+  ],
+  "detail": "捕获事件: 0 | waterfall: 0/7 | tools/result: 否"
+}

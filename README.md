@@ -71,6 +71,14 @@
 |---|---|---|---|---|
 | [dsh-balance](https://github.com/TwotwoPiggy/dsh-balance) | ✅ | Web 聊天框实时 Token 消耗估算 + DeepSeek 账户余额（纯 JS，ctx.inject 动态注入） | 2026-08-14 | [view](reports/balance-2026-08-14.json) |
 
+### 💻 编码开发（Coding & Development）
+
+*代码操作、git 集成、终端、文档生成、工具适配器*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [falsify-dsh](https://github.com/shi275773124/falsify-dsh) | ✅ | Falsify CLI 适配器：裁决收据（lint / review --json / gate）——第 4 个验证的外部插件 | 2026-08-14 | [view](reports/falsify-2026-08-14.json) |
+
 > 你的插件还没在？[拿徽标只要 2 分钟](#插件作者如何获得-verified-徽标)。
 
 ## 判定规则（透明公开）
