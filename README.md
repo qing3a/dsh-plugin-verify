@@ -17,6 +17,7 @@
 | 你的目标 | 跳转入口 |
 |---|---|
 | 找一个可信插件 | [Verified 目录](#verified-目录) |
+| 不知道装什么、想按场景选型 | [推荐清单（生态选型参考）](#推荐清单生态选型参考) |
 | 投稿你的插件（2 分钟上架） | [插件作者：投稿](#插件作者投稿你的插件2-分钟上架) |
 | 看懂徽标/状态 | [状态体系](#状态体系) |
 | 安全安装插件 | [使用者：如何安全安装](#使用者如何安全安装) |
@@ -116,6 +117,66 @@
 > **2026-08-15 收录批次**（5 个）：dsh-at-file · dsh-genui · dsh-automation · DSH-better-sidebar · ModLens——静态校验（R1 入口形态 + R2 patch YAML）全部通过，运行时验证（7/7 waterfall + tools/result）：**3 通过升级 ✅**（at-file / genui / modlens，报告已附），**2 标 ⓘ 环境边界**。复验结论（2026-08-15）：better-sidebar 本地 `pnpm build` 成功、产物入口形态正确，但 inject `webServer`/`webRuntime`；automation inject `storageDomain` 等 4 服务 + `connection`（浏览器 RPC 通道）——两者均依赖 web 环境服务，**headless 判定模式无法激活，需浏览器级验证通道（判定站方法论升级项）**，非插件行为缺陷。静态注意项实测结论：genui 缺 `name` 导出（loader 用 entry id 兜底）与 modlens 走 `exports` 入口均**加载正常**，判定站 R1 的检测盲区已用运行时验证补上。
 
 > 你的插件还没在？[拿徽标只要 2 分钟](#插件作者投稿你的插件2-分钟上架)。
+
+---
+
+## 🧭 推荐清单（生态选型参考）
+
+> 不知道装什么？这是从 **GitHub `dsh-plugin` topic（1700+ 仓库）与社区 awesome 清单**（[awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) · [bruc3van/awesome-dsh-plugin](https://github.com/bruc3van/awesome-dsh-plugin) · [0xsline/awesome-deepseek-harness](https://github.com/0xsline/awesome-deepseek-harness)）检索整理的分层选型参考（2026-08-15）。**它不是判定站验证结论**：清单里大多插件未经 7/7 waterfall 运行时验证，只有标注 ✅/ⓘ 的才是判定站已收录项（[Verified 目录](#verified-目录)）。链接与 ⭐ 数据为检索时点快照，未经逐一核实。
+
+**选型原则**：先装"管理基建"，再按你最痛的一两个场景补，别一次装很多。
+
+### 🥇 第一优先：先装"管理基建"
+
+| 插件 | 为什么装 |
+|---|---|
+| [dsh-market](https://github.com/dsh-market/dsh-market) | 官方社区推荐的插件市场：设置页内浏览/搜索/分类筛选/一键安装，已装插件一目了然 |
+| [plugin-registry](https://github.com/vlln/plugin-registry) | 可视化插件管理入口 + `make-dsh-plugin` 开发引导，新手首选 |
+| [dsh-backup](https://github.com/xiaoyuyu6420/dsh-backup) | 一键备份/恢复 DSH 用户数据，定时自动备份，装插件多了之后是救命稻草 |
+
+### 🥈 日常体验（几乎人人都受益）
+
+- **[DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar)**（⭐709）— 把侧边栏升级成工作台：内置文件渲染编辑、终端、Git 与子代理。目前最受欢迎的增强。
+- **[dsh-task-status](https://github.com/vlln/dsh-task-status)** — 后台任务进度 + 实时输出 tail 显示在对话页，构建/下载/测试时不用干瞪眼。
+- **[dsh-notification](https://github.com/omdsh-dev/dsh-notification)** — 回合完成发桌面通知，可按成功/失败/关键词过滤，长任务不用盯屏。
+- **[dsh-navbar](https://github.com/vlln/dsh-navbar)** — 长对话快速跳转任意用户消息节点。
+- **[dsh-at-file](https://github.com/omdsh-dev/dsh-at-file)** — 输入框里按 `@` 搜索工作区文件并附进 prompt，免去手动复制粘贴。
+- **[dsh-genui](https://github.com/omdsh-dev/dsh-genui)** — 在回复中直接渲染图表、表单、Mermaid、3D 场景，且用户操作能回送模型。
+- 想要"一次装齐"的可以看 **[dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui)**（⭐1.8k，生态最高星）：任务看板、Git 关系图、皮肤中心、桌面宠物、token 统计一站式合集
+
+### 🥉 让模型"看得见、搜得到"（纯文本模型的刚需）
+
+- **[ModLens](https://github.com/liustack/modlens)** ✅（⭐1.2k，第三方插件中 Star 最高）— 粘贴图片即得 OCR/布局/语义结构化证据，让纯文本模型可靠看图
+- **[modsearch](https://github.com/liustack/modsearch)** — 搜索网页和 X，返回带引用的结构化证据，与 modlens 组成"看+搜"组合
+- **[dsh-vision-toolkit](https://github.com/Anionex/dsh-vision-toolkit)**（⭐308）— 图片问答、长截图 OCR、UI 还原、像素对比，适合前端/视觉任务
+- 搜索后端增强：[anweat/dsh-web-search-pro](https://github.com/anweat/dsh-web-search-pro)（多引擎+缓存）、[TonyDua/dsh-web-search-exa](https://github.com/TonyDua/dsh-web-search-exa)（零配置 Exa）
+
+### ⚙️ 自动化与无人值守
+
+- **[dsh-loop](https://github.com/vlln/dsh-loop)** — `/loop` 定时循环
+- **[dsh-sentinel](https://github.com/fuhefei/dsh-sentinel)** — 文件/命令/HTTP/进程/Webhook 事件驱动唤醒，让循环从"定时"升级为"事件触发"
+- **[dsh-auto-continue](https://github.com/HsiangNianian/dsh-auto-continue)** — 网络波动/超时导致回合失败后自动发"继续"续跑，无人值守必备
+
+### 🧠 跨会话记忆
+
+- **[dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve)** — 纯插件五轨长期记忆 + 技能自进化，零核心修改、卸载即净
+- **[dsh-mneme](https://github.com/modusensus/dsh-mneme)** — SQLite + 可人工编辑的 Markdown 镜像，记忆透明可改（"记忆主权"派）
+
+### 🔒 安全相关（装第三方插件前建议先有）
+
+- **[dsh-plugin-vetting](https://github.com/truelove-dreamer/dsh-plugin-vetting)** — 装插件前静态扫描恶意模式（外传/凭据/混淆），覆盖供应链检查
+- **[dsh-mcpguard](https://github.com/ChenLaoshiYF/dsh-mcpguard)** — 扫描 skill 与 MCP 配置中的提示注入、同形字、危险 shell
+- **[dsh-permission-rules](https://github.com/PerryLink/dsh-permission-rules)** — Claude Code 风格声明式权限规则（allow/deny/ask）
+
+### 🎮 可选的乐子（按需）
+
+- [whale-girl](https://github.com/vlln/whale-girl) 桌面宠物
+- [dsh-minigames](https://github.com/lhh010/dsh-minigames) 18 款摸鱼小游戏
+- [dsh-MusicPlayer](https://github.com/xiekai886/dsh-MusicPlayer) 网易云音乐播放器
+
+**我的建议**：不用一次装很多。从 **[dsh-market](https://github.com/dsh-market/dsh-market) + [dsh-backup](https://github.com/xiaoyuyu6420/dsh-backup)** 起步，再加你当前最痛的一两个场景（比如纯文本模型就上 modlens+modsearch；总盯着长任务就上 dsh-task-status+dsh-notification），用几天再扩。
+
+> ⚠️ **注意**：这些全是第三方插件，会在你机器上运行代码。装之前看一眼仓库的源码、许可证和最近更新情况，优先装 Star 高、活跃维护的。安装方式一般是 `dsh plugin add <GitHub 仓库>` 或在市场里一键安装。**推荐 ≠ 判定站 Verified**——想让清单里哪个插件拿到 ✅ 徽标，走[投稿流程](#插件作者投稿你的插件2-分钟上架)，判定站免费帮你跑一遍运行时验证。
 
 ---
 
