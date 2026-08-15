@@ -2,7 +2,7 @@
 
 > DSH 插件**判定站**：每个插件经过同一套运行时验证（7/7 waterfall + tools/result），通过才给 ✅ Verified 徽标。**与 awesome-dsh-plugins（全量分级观测）互补：它做 L0-L4 全量观测分级，我们把 L4 运行实测做深（7/7 waterfall + tools/result）。**
 
-![verified](https://img.shields.io/badge/Verified%20插件-10-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![reports](https://img.shields.io/badge/可复现报告-10-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
+![verified](https://img.shields.io/badge/Verified%20插件-12-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![reports](https://img.shields.io/badge/可复现报告-12-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
 
 - **找可信插件**：按功能分类浏览，每个插件带 Verified 徽标 + 验证日期 + 可复现报告——证据可复现的运行时验证（7/7 waterfall + tools/result）
 - **装得放心**：徽标 = 通过了完整 agent 循环审查；附带安装指引与安全提示
@@ -36,7 +36,7 @@
 | **插件规范建议** | 《DSH 插件开发与设计规范建议 v0.1》（每条带依据与踩坑记录） | [docs/plugin-standards.md](docs/plugin-standards.md) |
 | **评审清单** | 人工评审层：官方 defensive-patterns + postmortem 检查点 | [docs/review-checklist.md](docs/review-checklist.md) |
 | **审核标准** | 评审标准总纲 v0.1.0：P（插件必检）/D（dsh-desktop 基线）/C（官方贡献）三集规则，钉定 mainline `47f94385`，含版本规程与溯源修正 | [docs/review-standards.md](docs/review-standards.md) |
-| **验证报告** | 10 份可复现报告（插件 commit · mainline commit · 验证日期） | [reports/](#资源中心) |
+| **验证报告** | 12 份可复现报告（插件 commit · mainline commit · 验证日期） | [reports/](#资源中心) |
 | **文章** | 从零拆解 / 踩坑全记录 / 验证实战 / 判定站从零到跑通（4 篇） | [posts/](#文章) |
 | **投稿系统** | Agent 友好的 6 步投稿 Skill + 自检 gate | [skills/submission/SKILL.md](skills/submission/SKILL.md) |
 
@@ -77,6 +77,7 @@
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
 | [dsh-tray](https://github.com/qing3a/dsh-tray) | ✅ | Windows 系统托盘（trayicon exe 宿主，无 native 编译）：菜单/通知/headless 降级 | 2026-08-14 | [view](reports/tray-2026-08-14.json) |
+| [dsh-notification](https://github.com/omdsh-dev/dsh-notification) | ✅ | 回合完成桌面通知：成功/失败/关键词过滤，长任务不用盯屏 | 2026-08-16 | [view](reports/notification-2026-08-16.json) |
 | [DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) | ⓘ | 服务化侧栏框架：右侧栏+底部面板双工作台（文件/编辑预览/内嵌浏览器/真实终端/Git/后台任务）；`ctx.betterSidebar` 服务开放给第三方插件注册 tab/viewer；只注册 `settings.section`（未碰 single 槽） | 2026-08-15 复验 | — |
 ### 🔒 安全与合规（Security & Compliance）
 
@@ -93,6 +94,7 @@
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
 | [dsh-balance](https://github.com/TwotwoPiggy/dsh-balance) | ✅ | Web 聊天框实时 Token 消耗估算 + DeepSeek 账户余额（纯 JS，ctx.inject 动态注入） | 2026-08-14 | [view](reports/balance-2026-08-14.json) |
+| [dsh-navbar](https://github.com/vlln/dsh-navbar) | ✅ | 对话节点导航条：右侧缘节点串快速跳转任意 user 消息节点（长对话不用滚屏） | 2026-08-16 | [view](reports/navbar-2026-08-16.json) |
 | [dsh-automation](https://github.com/titanwings/dsh-automation) | ⓘ | 定时/自动化任务调度：cron 触发、并发限制、人工审批门、历史回放；`automationDomainSpec` 数据域（依赖 zod/luxon，非 zero-dep） | 2026-08-15 复验 | — |
 
 ### ⚙️ 自动化与无人值守（Automation）
@@ -122,7 +124,7 @@
 |---|---|---|---|---|
 | [ModLens](https://github.com/liustack/modlens) | ✅ | 首个 DSH 视觉插件：聊天直接粘贴图片 → 文本模型获得视觉（image→文本引擎），注入 tools/agents/attachments/llm（入口走 package.json `exports` 而非 `main`，实测加载正常） | 2026-08-15 | [view](reports/modlens-2026-08-15.json) |
 
-> **2026-08-16 新增**：**dsh-sentinel**（v0.10.0）✅ Verified——它的修复正是判定站 #4 建议的产物（webServer 移出必选 inject + heartbeat unref），作者先自测通过、判定站独立复验 7/7 waterfall + tools/result 一致，形成"验证 → 作者采纳 → 生态受益"完整闭环。
+> **2026-08-16 收录批次**（3 个，全部 ✅）：dsh-sentinel（v0.10.0）· dsh-navbar（v0.3.0）· dsh-notification（v0.1.1）——均为运行时验证 7/7 waterfall + tools/result 通过（报告已附）。sentinel 的修复正是判定站 #4 建议的产物（webServer 移出必选 inject + heartbeat unref），作者先自测通过、判定站独立复验一致，形成"验证 → 作者采纳 → 生态受益"完整闭环；navbar/notification 为推荐清单候选，验证通过后升级为已验证推荐。
 
 > **2026-08-15 收录批次**（5 个）：dsh-at-file · dsh-genui · dsh-automation · DSH-better-sidebar · ModLens——静态校验（R1 入口形态 + R2 patch YAML）全部通过，运行时验证（7/7 waterfall + tools/result）：**3 通过升级 ✅**（at-file / genui / modlens，报告已附），**2 标 ⓘ 环境边界**。复验结论（2026-08-15）：better-sidebar 本地 `pnpm build` 成功、产物入口形态正确，但 inject `webServer`/`webRuntime`；automation inject `storageDomain` 等 4 服务 + `connection`（浏览器 RPC 通道）——两者均依赖 web 环境服务，**headless 判定模式无法激活，需浏览器级验证通道（判定站方法论升级项）**，非插件行为缺陷。静态注意项实测结论：genui 缺 `name` 导出（loader 用 entry id 兜底）与 modlens 走 `exports` 入口均**加载正常**，判定站 R1 的检测盲区已用运行时验证补上。
 
@@ -148,8 +150,8 @@
 
 - **[DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar)**（⭐1k）— 把侧边栏升级成工作台：内置文件渲染编辑、终端、Git 与子代理。目前最受欢迎的增强。
 - **[dsh-task-status](https://github.com/vlln/dsh-task-status)** — 后台任务进度 + 实时输出 tail 显示在对话页，构建/下载/测试时不用干瞪眼。
-- **[dsh-notification](https://github.com/omdsh-dev/dsh-notification)** — 回合完成发桌面通知，可按成功/失败/关键词过滤，长任务不用盯屏。
-- **[dsh-navbar](https://github.com/vlln/dsh-navbar)** — 长对话快速跳转任意用户消息节点。
+- **[dsh-notification](https://github.com/omdsh-dev/dsh-notification)** ✅ — 回合完成发桌面通知，可按成功/失败/关键词过滤，长任务不用盯屏。*判定站 ✅：v0.1.1 复验 7/7 waterfall（2026-08-16）*
+- **[dsh-navbar](https://github.com/vlln/dsh-navbar)** ✅ — 长对话快速跳转任意用户消息节点。*判定站 ✅：v0.3.0 复验 7/7 waterfall（2026-08-16）*
 - **[dsh-at-file](https://github.com/omdsh-dev/dsh-at-file)** — 输入框里按 `@` 搜索工作区文件并附进 prompt，免去手动复制粘贴。
 - **[dsh-genui](https://github.com/omdsh-dev/dsh-genui)** — 在回复中直接渲染图表、表单、Mermaid、3D 场景，且用户操作能回送模型。
 - 想要"一次装齐"的可以看 **[dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui)**（⭐2.4k，生态最高星）：任务看板、Git 关系图、皮肤中心、桌面宠物、token 统计一站式合集
@@ -250,8 +252,10 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 | dsh-genui | [reports/genui-2026-08-15.json](reports/genui-2026-08-15.json) | ✅ |
 | ModLens | [reports/modlens-2026-08-15.json](reports/modlens-2026-08-15.json) | ✅ |
 | dsh-sentinel | [reports/sentinel-2026-08-16.json](reports/sentinel-2026-08-16.json) | ✅ |
+| dsh-navbar | [reports/navbar-2026-08-16.json](reports/navbar-2026-08-16.json) | ✅ |
+| dsh-notification | [reports/notification-2026-08-16.json](reports/notification-2026-08-16.json) | ✅ |
 
-> 报告均为 2026-08-14 用修正后 CLI（rules[] + R3）绝对路径重验版本，非早期空转版本；sentinel 为 2026-08-16 修复版独立复验。
+> 报告均为 2026-08-14 用修正后 CLI（rules[] + R3）绝对路径重验版本，非早期空转版本；2026-08-16 三份（sentinel/navbar/notification）为当日独立复验。
 
 ### 工具与脚本
 

@@ -1,0 +1,44 @@
+{
+  "plugin": "C:/Users/Administrator/AppData/Local/Temp/cand-notification/omdsh-dev-dsh-notification-3e33100",
+  "repo": "C:\\Users\\Administrator\\Desktop\\ds\\deepseek-harness",
+  "date": "2026-08-15T18:46:03.143Z",
+  "pass": true,
+  "waterfallFound": [
+    "system-prompt/assemble",
+    "agent/pre-step",
+    "agent/request",
+    "llm/stream",
+    "tools/pre-execute",
+    "tools/execute",
+    "tools/post-execute"
+  ],
+  "waterfallMissing": [],
+  "rules": [
+    {
+      "name": "R1-entry-shape",
+      "pass": true,
+      "detail": "入口 C:\\Users\\Administrator\\AppData\\Local\\Temp\\cand-notification\\omdsh-dev-dsh-notification-3e33100\\lib\\index.js：未见 namespace 形式（name+apply），静态形态检查不适用（default=null）"
+    },
+    {
+      "name": "R2-patch-yaml",
+      "pass": true,
+      "detail": "patch ./cordis.patch.yml：!!js 表达式均位于 config 子树（6 行）"
+    },
+    {
+      "name": "P202-spawn-usage",
+      "pass": true,
+      "detail": "P-202 未见裸 child_process spawn（无导入或仅封装调用）"
+    },
+    {
+      "name": "P401-single-slot",
+      "pass": true,
+      "detail": "P-401 未见 single 槽注册（slots.register 未命中官方 single 槽清单）"
+    },
+    {
+      "name": "R3-tools-result",
+      "pass": true,
+      "detail": "工具真实执行成功（1 次结果，无 isError）"
+    }
+  ],
+  "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是"
+}
