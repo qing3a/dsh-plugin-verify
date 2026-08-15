@@ -122,7 +122,7 @@
 
 ## 🧭 推荐清单（生态选型参考）
 
-> 不知道装什么？这是从 **GitHub `dsh-plugin` topic（1700+ 仓库）与社区 awesome 清单**（[awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) · [bruc3van/awesome-dsh-plugin](https://github.com/bruc3van/awesome-dsh-plugin) · [0xsline/awesome-deepseek-harness](https://github.com/0xsline/awesome-deepseek-harness)）检索整理的分层选型参考（2026-08-15）。**它不是判定站验证结论**：清单里大多插件未经 7/7 waterfall 运行时验证，只有标注 ✅/ⓘ 的才是判定站已收录项（[Verified 目录](#verified-目录)）。链接与 ⭐ 数据为检索时点快照，未经逐一核实。
+> 不知道装什么？这是从 **GitHub `dsh-plugin` topic（1700+ 仓库）与社区 awesome 清单**（[awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) · [bruc3van/awesome-dsh-plugin](https://github.com/bruc3van/awesome-dsh-plugin) · [0xsline/awesome-deepseek-harness](https://github.com/0xsline/awesome-deepseek-harness)）检索整理的分层选型参考（2026-08-15）。**它不是判定站验证结论**：清单里大多插件未经 7/7 waterfall 运行时验证，只有标注 ✅/ⓘ 的才是判定站已收录项（[Verified 目录](#verified-目录)）。链接已逐一核查真实存在（2026-08-15），⭐ 为核查时点实测值，会随生态增长漂移。
 
 **选型原则**：先装"管理基建"，再按你最痛的一两个场景补，别一次装很多。
 
@@ -136,19 +136,19 @@
 
 ### 🥈 日常体验（几乎人人都受益）
 
-- **[DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar)**（⭐709）— 把侧边栏升级成工作台：内置文件渲染编辑、终端、Git 与子代理。目前最受欢迎的增强。
+- **[DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar)**（⭐1k）— 把侧边栏升级成工作台：内置文件渲染编辑、终端、Git 与子代理。目前最受欢迎的增强。
 - **[dsh-task-status](https://github.com/vlln/dsh-task-status)** — 后台任务进度 + 实时输出 tail 显示在对话页，构建/下载/测试时不用干瞪眼。
 - **[dsh-notification](https://github.com/omdsh-dev/dsh-notification)** — 回合完成发桌面通知，可按成功/失败/关键词过滤，长任务不用盯屏。
 - **[dsh-navbar](https://github.com/vlln/dsh-navbar)** — 长对话快速跳转任意用户消息节点。
 - **[dsh-at-file](https://github.com/omdsh-dev/dsh-at-file)** — 输入框里按 `@` 搜索工作区文件并附进 prompt，免去手动复制粘贴。
 - **[dsh-genui](https://github.com/omdsh-dev/dsh-genui)** — 在回复中直接渲染图表、表单、Mermaid、3D 场景，且用户操作能回送模型。
-- 想要"一次装齐"的可以看 **[dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui)**（⭐1.8k，生态最高星）：任务看板、Git 关系图、皮肤中心、桌面宠物、token 统计一站式合集
+- 想要"一次装齐"的可以看 **[dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui)**（⭐2.4k，生态最高星）：任务看板、Git 关系图、皮肤中心、桌面宠物、token 统计一站式合集
 
 ### 🥉 让模型"看得见、搜得到"（纯文本模型的刚需）
 
-- **[ModLens](https://github.com/liustack/modlens)** ✅（⭐1.2k，第三方插件中 Star 最高）— 粘贴图片即得 OCR/布局/语义结构化证据，让纯文本模型可靠看图
+- **[ModLens](https://github.com/liustack/modlens)** ✅（⭐1.7k）— 粘贴图片即得 OCR/布局/语义结构化证据，让纯文本模型可靠看图
 - **[modsearch](https://github.com/liustack/modsearch)** — 搜索网页和 X，返回带引用的结构化证据，与 modlens 组成"看+搜"组合
-- **[dsh-vision-toolkit](https://github.com/Anionex/dsh-vision-toolkit)**（⭐308）— 图片问答、长截图 OCR、UI 还原、像素对比，适合前端/视觉任务
+- **[dsh-vision-toolkit](https://github.com/Anionex/dsh-vision-toolkit)**（⭐405）— 图片问答、长截图 OCR、UI 还原、像素对比，适合前端/视觉任务
 - 搜索后端增强：[anweat/dsh-web-search-pro](https://github.com/anweat/dsh-web-search-pro)（多引擎+缓存）、[TonyDua/dsh-web-search-exa](https://github.com/TonyDua/dsh-web-search-exa)（零配置 Exa）
 
 ### ⚙️ 自动化与无人值守
