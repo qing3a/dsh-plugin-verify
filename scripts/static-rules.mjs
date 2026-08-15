@@ -17,7 +17,7 @@
  * 退出码：0=静态规则全过  1=有规则不通过  2=用法/环境错误
  */
 
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -152,16 +152,106 @@ function rulePatch(pluginDir) {
   return { pass: true, detail: `patch ${patch}：!!js 表达式均位于 config 子树（${lines.length} 行）` }
 }
 
+/**
+ * 收集插件运行时源码文件：入口（main 指向）+ src/ 下全部 ts/tsx/js/mjs。
+ * 不含 scripts/、tests/、build 脚本——那是开发期不是插件运行时。
+ * 入口缺失（modlens 形态：无 main 走 exports）时回退 src/index.ts → dsh/index.js。
+ */
+function collectSourceFiles(pluginDir, entryFile) {
+  const files = new Set()
+  if (entryFile && existsSync(entryFile)) files.add(entryFile)
+  const srcDir = join(pluginDir, 'src')
+  const walk = (dir) => {
+    let entries = []
+    try { entries = readdirSync(dir, { withFileTypes: true }) } catch { return }
+    for (const e of entries) {
+      const p = join(dir, e.name)
+      if (e.isDirectory()) walk(p)
+      else if (/\.(ts|tsx|js|mjs|jsx)$/.test(e.name)) files.add(p)
+    }
+  }
+  if (existsSync(srcDir)) walk(srcDir)
+  return [...files]
+}
+
+/** 解析运行时入口：main 指向 → src/index.ts → dsh/index.js（exports 入口形态） */
+function resolveEntry(pluginDir) {
+  const pkgPath = join(pluginDir, 'package.json')
+  if (!existsSync(pkgPath)) return ''
+  const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'))
+  if (typeof pkg.main === 'string') {
+    const mainEntry = join(pluginDir, pkg.main)
+    if (existsSync(mainEntry)) return mainEntry
+  }
+  for (const rel of ['src/index.ts', 'dsh/index.js', 'dsh/index.ts']) {
+    const p = join(pluginDir, rel)
+    if (existsSync(p)) return p
+  }
+  return ''
+}
+
+/** P-202：裸 child_process spawn（不经 ctx.subprocess）。SHOULD 级——命中给 warning 不拦判定。 */
+const SPAWN_IMPORT = /(?:from\s+['"]node:child_process['"]|require\(\s*['"]child_process['"]\s*\))/i
+const SPAWN_CALL = /\bspawn(?:Sync)?\s*\(/
+function ruleSpawn(pluginDir) {
+  const entry = resolveEntry(pluginDir)
+  if (!entry) return { pass: true, detail: 'P-202 无法定位入口，跳过' }
+  const files = collectSourceFiles(pluginDir, entry)
+  const hits = []
+  for (const f of files) {
+    const src = readFileSync(f, 'utf8')
+    if (SPAWN_IMPORT.test(src) && SPAWN_CALL.test(src)) hits.push(f.slice(pluginDir.length + 1))
+  }
+  if (hits.length > 0) {
+    return {
+      pass: true, warn: true,
+      detail: `⚠️ [SHOULD P-202] ${hits.length} 个运行时文件裸 import child_process + spawn——不经 ctx.subprocess 的子进程逃逸 host-exit 同步回收，建议改经 ctx.subprocess 管理: ${hits.join(', ')}`,
+    }
+  }
+  return { pass: true, detail: 'P-202 未见裸 child_process spawn（无导入或仅封装调用）' }
+}
+
+/**
+ * P-401：注册 single 槽（shadow 官方 UI + 破坏其子槽）。SHOULD 级。
+ * single 槽清单来源：官方 slot-catalog.ts（42 槽）中人工提取的 single 槽——
+ * sidebar.workspaces（WorkspaceBrowser 独占）、sidebar.settings（single），
+ * 以及其下子槽（sidebar.workspaces.*）；显式 kind: 'single' 声明同判。
+ */
+const SINGLE_SLOT_RE = /(?:'|")(sidebar\.workspaces(?:\.[A-Za-z0-9_-]+)*|sidebar\.settings)(?:'|")/
+const SLOTS_REGISTER_CALL = /\bslots\.register\s*\(/
+function ruleSingleSlot(pluginDir) {
+  const entry = resolveEntry(pluginDir)
+  if (!entry) return { pass: true, detail: 'P-401 无法定位入口，跳过' }
+  const files = collectSourceFiles(pluginDir, entry)
+  const hits = []
+  for (const f of files) {
+    const src = readFileSync(f, 'utf8')
+    if (!SLOTS_REGISTER_CALL.test(src)) continue
+    const m = src.match(SINGLE_SLOT_RE)
+    if (m) hits.push(`${f.slice(pluginDir.length + 1)} 注册 ${m[1]}`)
+    else if (/kind\s*:\s*['"]single['"]/.test(src)) hits.push(`${f.slice(pluginDir.length + 1)} 显式 kind: 'single'`)
+  }
+  if (hits.length > 0) {
+    return {
+      pass: true, warn: true,
+      detail: `⚠️ [SHOULD P-401] ${hits.length} 处注册 single 槽——第三方 priority 恒低，注册即 shadow 官方 UI 并破坏其子槽声明（如 sidebar.workspaces.directoryFlow 链路）: ${hits.join(', ')}`,
+    }
+  }
+  return { pass: true, detail: 'P-401 未见 single 槽注册（slots.register 未命中官方 single 槽清单）' }
+}
+
 export function runStaticRules(pluginDir) {
   const abs = resolve(pluginDir)
   const rules = [
     { name: 'R1-entry-shape', ...ruleEntry(abs) },
     { name: 'R2-patch-yaml', ...rulePatch(abs) },
+    { name: 'P202-spawn-usage', ...ruleSpawn(abs) },
+    { name: 'P401-single-slot', ...ruleSingleSlot(abs) },
   ]
   return {
     rules,
     pass: rules.every((r) => r.pass),
-    detail: rules.map((r) => `${r.pass ? '✓' : '✗'} ${r.name}`).join(' '),
+    detail: rules.map((r) => `${r.warn ? '⚠️' : (r.pass ? '✓' : '✗')} ${r.name}`).join(' '),
   }
 }
 

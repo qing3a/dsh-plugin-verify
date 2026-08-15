@@ -72,7 +72,7 @@
 | ID | 级 | 检查层 | 规则 | 依据 | 落地 |
 |---|---|---|---|---|---|
 | P-201 | MUST | human | 资源清理经 `ctx.effect(executor, label?)` 注册 disposer；事件监听返回 disposer、不裸监听不清理；卸载按逆序执行 | `vendor/cordis/src/fiber.ts`（disposer 逆序） | 待落地（review-checklist F 扩展） |
-| P-202 | SHOULD | auto-static | 不裸 `child_process.spawn`：子进程必须经 `ctx.subprocess` 或等效生命周期管理——裸 spawn 逃逸 host-exit 同步 SIGKILL 回收 | `packages/subprocess/subprocess-local/README.md`、`src/spawn.ts` | 待落地（新增静态扫描：源码 import child_process / 直接 spawn 调用） |
+| P-202 | SHOULD | auto-static | 不裸 `child_process.spawn`：子进程必须经 `ctx.subprocess` 或等效生命周期管理——裸 spawn 逃逸 host-exit 同步 SIGKILL 回收 | `packages/subprocess/subprocess-local/README.md`、`src/spawn.ts` | ✅ 已落地（static-rules R4，2026-08-15；实测命中 better-sidebar/src/git.ts、modlens/dsh/index.js） |
 | P-203 | SHOULD | human | spawn 命令用 scrubbed env：按 `/KEY|PASSWORD|SECRET|TOKEN/i` + 全部 `DSH_*` 剔除，保留 PATH/HOME/locale/proxy；刻意下发凭证走 spec 显式 `env` | `packages/subprocess/subprocess/src/index.ts:44` | 待落地（review-checklist H 对齐，给出官方正则） |
 | P-204 | MUST | auto-runtime | attachment 只存图片（png/jpeg/webp/gif），内容寻址 `sha256:<digest>`；**禁止**用 attachment 承载 PDF/Word/简历 | `packages/attachment/attachment`（`ImageMediaType` 四值） | 待落地（auditor 扩展：监听 attachment 写入类型） |
 
@@ -88,7 +88,7 @@
 
 | ID | 级 | 检查层 | 规则 | 依据 | 落地 |
 |---|---|---|---|---|---|
-| P-401 | MUST | human | **不注册 `single` 槽**：第三方 priority 自动递减（-1、-2…），注册即 shadow 官方 occupant 且破坏其子槽声明；零风险扩展点只有 `list`/`keyed` 槽（`sidebar.footer.action`、`shell.overlay`、`conversation.chat.node`） | `packages/client/ui-slots/src/index.ts`（priority 低者胜出）、`slot-catalog.ts`（42 槽 + replaceRisk 标注） | 待落地 |
+| P-401 | MUST | human | **不注册 `single` 槽**：第三方 priority 自动递减（-1、-2…），注册即 shadow 官方 occupant 且破坏其子槽声明；零风险扩展点只有 `list`/`keyed` 槽（`sidebar.footer.action`、`shell.overlay`、`conversation.chat.node`） | `packages/client/ui-slots/src/index.ts`（priority 低者胜出）、`slot-catalog.ts`（42 槽 + replaceRisk 标注） | ✅ 已落地（static-rules R5，2026-08-15；5 个新插件全过） |
 | P-402 | SHOULD | auto-static | 对外贡献 UI 必须 `inject: ['slots']` 且经 `ctx.slots.inject(key, ...)` 声明存在——注册进未声明槽直接抛错 | `packages/client/AGENTS.md`（slots 注入约定） | 待落地（静态扫描：源码含 `ctx.slots` 时查 inject 数组） |
 | P-403 | SHOULD | auto-static | UI 插件声明 `dsh.client` manifest（`platform: 'web'`、exports `./client`），否则产物不进入前端 bundle | `packages/client/AGENTS.md:94` | 待落地 |
 | P-404 | SHOULD | human | UI 文案：`locales.ts` 导出 `zh`（键集权威源）与 `en`（`satisfies Record<ThemeKey, string>` 强制键集完整） | `packages/client/locale/README.md` | 待落地 |
@@ -183,6 +183,7 @@ Rust 壳/宿主的自检清单（不进插件判定，dsh-desktop 开发迭代�
 | 版本 | 日期 | 变更 | 影响规则 |
 |---|---|---|---|
 | v0.1.0 | 2026-08-15 | 初版：从《DSH 设计规范整理》（钉定 `47f94385`）落地 P/D/C 三集；R1/R2/R3 归入 P-101/102/103；溯源修正 5 处（附录 A） | — |
+| v0.1.1 | 2026-08-15 | P-202/P-401 落地（static-rules R4/R5）；补 web 复验结论：ⓘ 插件（automation/better-sidebar）为 web 环境依赖，需浏览器级验证通道，headless 判定无法发 ✅ | P-202、P-401 |
 
 ---
 
