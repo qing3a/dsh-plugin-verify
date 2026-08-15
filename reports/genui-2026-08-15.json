@@ -1,0 +1,34 @@
+{
+  "plugin": "C:/Users/ADMINI~1/AppData/Local/Temp/dsh-review/dsh-genui",
+  "repo": "C:\\Users\\Administrator\\Desktop\\ds\\deepseek-harness",
+  "date": "2026-08-15T07:15:45.150Z",
+  "pass": true,
+  "waterfallFound": [
+    "system-prompt/assemble",
+    "agent/pre-step",
+    "agent/request",
+    "llm/stream",
+    "tools/pre-execute",
+    "tools/execute",
+    "tools/post-execute"
+  ],
+  "waterfallMissing": [],
+  "rules": [
+    {
+      "name": "R1-entry-shape",
+      "pass": true,
+      "detail": "入口 C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\dsh-review\\dsh-genui\\lib\\index.js：未见 namespace 形式（name+apply），静态形态检查不适用（default=null）"
+    },
+    {
+      "name": "R2-patch-yaml",
+      "pass": true,
+      "detail": "patch ./cordis.patch.yml：!!js 表达式均位于 config 子树（10 行）"
+    },
+    {
+      "name": "R3-tools-result",
+      "pass": true,
+      "detail": "工具真实执行成功（1 次结果，无 isError）"
+    }
+  ],
+  "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是"
+}

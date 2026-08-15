@@ -2,7 +2,7 @@
 
 > DSH 插件**判定站**：每个插件经过同一套运行时验证（7/7 waterfall + tools/result），通过才给 ✅ Verified 徽标。**与 awesome-dsh-plugins（全量分级观测）互补：它做 L0-L4 全量观测分级，我们把 L4 运行实测做深（7/7 waterfall + tools/result）。**
 
-![verified](https://img.shields.io/badge/Verified%20插件-6-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![reports](https://img.shields.io/badge/可复现报告-6-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
+![verified](https://img.shields.io/badge/Verified%20插件-9-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![reports](https://img.shields.io/badge/可复现报告-9-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
 
 - **找可信插件**：按功能分类浏览，每个插件带 Verified 徽标 + 验证日期 + 可复现报告——证据可复现的运行时验证（7/7 waterfall + tools/result）
 - **装得放心**：徽标 = 通过了完整 agent 循环审查；附带安装指引与安全提示
@@ -35,7 +35,7 @@
 | **插件规范建议** | 《DSH 插件开发与设计规范建议 v0.1》（每条带依据与踩坑记录） | [docs/plugin-standards.md](docs/plugin-standards.md) |
 | **评审清单** | 人工评审层：官方 defensive-patterns + postmortem 检查点 | [docs/review-checklist.md](docs/review-checklist.md) |
 | **审核标准** | 评审标准总纲 v0.1.0：P（插件必检）/D（dsh-desktop 基线）/C（官方贡献）三集规则，钉定 mainline `47f94385`，含版本规程与溯源修正 | [docs/review-standards.md](docs/review-standards.md) |
-| **验证报告** | 6 份可复现报告（插件 commit · mainline commit · 验证日期） | [reports/](#资源中心) |
+| **验证报告** | 9 份可复现报告（插件 commit · mainline commit · 验证日期） | [reports/](#资源中心) |
 | **文章** | 从零拆解 / 踩坑全记录 / 验证实战 / 判定站从零到跑通（4 篇） | [posts/](#文章) |
 | **投稿系统** | Agent 友好的 6 步投稿 Skill + 自检 gate | [skills/submission/SKILL.md](skills/submission/SKILL.md) |
 
@@ -50,6 +50,7 @@
 |---|---|---|---|
 | ✅ **Verified** | 已验证 | 通过完整运行时验证（7/7 waterfall + tools/result），证据可复现 | 非官方背书、非全功能测试、非安全审计 |
 | ⏳ **未验证** | 未验证 | 已收录但尚未运行时验证 | 不代表坏，只是还没测 |
+| ⓘ **环境边界** | 静态通过、运行时未激活 | headless 判定环境缺其依赖服务（web 重依赖/特定注入），属判定方法边界而非插件缺陷 | 不代表坏；在完整 web profile 下可能工作正常，需换环境复验 |
 | ❌ **验证失败** | 失败 | 运行时验证发现问题（有报告） | 不代表永远不可用，修复后可复测 |
 
 > 每个判定附带四项：**插件 commit · mainline commit · 验证日期 · 报告**。缺一项即降低信任等级。
@@ -75,7 +76,7 @@
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
 | [dsh-tray](https://github.com/qing3a/dsh-tray) | ✅ | Windows 系统托盘（trayicon exe 宿主，无 native 编译）：菜单/通知/headless 降级 | 2026-08-14 | [view](reports/tray-2026-08-14.json) |
-| [DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) | ⏳ | 服务化侧栏框架：右侧栏+底部面板双工作台（文件/编辑预览/内嵌浏览器/真实终端/Git/后台任务）；`ctx.betterSidebar` 服务开放给第三方插件注册 tab/viewer；只注册 `settings.section`（未碰 single 槽） | 静态通过·待运行时 | — |
+| [DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) | ⓘ | 服务化侧栏框架：右侧栏+底部面板双工作台（文件/编辑预览/内嵌浏览器/真实终端/Git/后台任务）；`ctx.betterSidebar` 服务开放给第三方插件注册 tab/viewer；只注册 `settings.section`（未碰 single 槽） | 2026-08-15 复验 | — |
 
 ### 🔒 安全与合规（Security & Compliance）
 
@@ -92,7 +93,7 @@
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
 | [dsh-balance](https://github.com/TwotwoPiggy/dsh-balance) | ✅ | Web 聊天框实时 Token 消耗估算 + DeepSeek 账户余额（纯 JS，ctx.inject 动态注入） | 2026-08-14 | [view](reports/balance-2026-08-14.json) |
-| [dsh-automation](https://github.com/titanwings/dsh-automation) | ⏳ | 定时/自动化任务调度：cron 触发、并发限制、人工审批门、历史回放；`automationDomainSpec` 数据域（依赖 zod/luxon，非 zero-dep） | 静态通过·待运行时 | — |
+| [dsh-automation](https://github.com/titanwings/dsh-automation) | ⓘ | 定时/自动化任务调度：cron 触发、并发限制、人工审批门、历史回放；`automationDomainSpec` 数据域（依赖 zod/luxon，非 zero-dep） | 2026-08-15 复验 | — |
 
 ### 💻 编码开发（Coding & Development）
 
@@ -102,8 +103,8 @@
 |---|---|---|---|---|
 | [dsh-repo-context](https://github.com/qing3a/dsh-repo-context) | ✅ | 把 git 状态与仓库规范动态注入 system prompt（section/context/variable，官方缝隙插件） | 2026-08-14 | [view](reports/repo-context-2026-08-14.json) |
 | [falsify-dsh](https://github.com/shi275773124/falsify-dsh) | ✅ | Falsify CLI 适配器：裁决收据（lint / review --json / gate） | 2026-08-14 | [view](reports/falsify-2026-08-14.json) |
-| [dsh-at-file](https://github.com/omdsh-dev/dsh-at-file) | ⏳ | Codex 风格 @path 引用：对话里 `@路径` 解析为文件上下文（agent/pre-step 瀑布注入），客户端注入 ui-input-trigger/ui-slots | 静态通过·待运行时 | — |
-| [dsh-genui](https://github.com/omdsh-dev/dsh-genui) | ⏳ | ```dsh-ui fence 生成 UI：模型用 DSL 声明界面，client 渲染器 + settings.section 注册（静态注意：缺 `name` 导出，loader 用 entry id 兜底） | 静态通过·待运行时 | — |
+| [dsh-at-file](https://github.com/omdsh-dev/dsh-at-file) | ✅ | Codex 风格 @path 引用：对话里 `@路径` 解析为文件上下文（agent/pre-step 瀑布注入），客户端注入 ui-input-trigger/ui-slots | 2026-08-15 | [view](reports/at-file-2026-08-15.json) |
+| [dsh-genui](https://github.com/omdsh-dev/dsh-genui) | ✅ | ```dsh-ui fence 生成 UI：模型用 DSL 声明界面，client 渲染器 + settings.section 注册 | 2026-08-15 | [view](reports/genui-2026-08-15.json) |
 
 ### 🧠 模型能力增强（Model Capabilities）
 
@@ -111,9 +112,9 @@
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
-| [ModLens](https://github.com/liustack/modlens) | ⏳ | 首个 DSH 视觉插件：聊天直接粘贴图片 → 文本模型获得视觉（image→文本引擎），注入 tools/agents/attachments/llm（静态注意：package.json 无 `main`、走 `exports` 入口，R1 fail-closed 待复核） | 静态通过·待运行时 | — |
+| [ModLens](https://github.com/liustack/modlens) | ✅ | 首个 DSH 视觉插件：聊天直接粘贴图片 → 文本模型获得视觉（image→文本引擎），注入 tools/agents/attachments/llm（入口走 package.json `exports` 而非 `main`，实测加载正常） | 2026-08-15 | [view](reports/modlens-2026-08-15.json) |
 
-> **2026-08-15 收录批次**（5 个）：dsh-at-file · dsh-genui · dsh-automation · DSH-better-sidebar · ModLens——已完成静态校验（R1 入口形态 + R2 patch YAML），标记"静态通过·待运行时"；运行时验证（7/7 waterfall + tools/result）进行中，通过后升级 ✅ 并补报告。静态注意项（genui 缺 `name` 导出、modlens 走 `exports` 入口）不影响加载，属 R1 检测盲区，待运行时验证复核。
+> **2026-08-15 收录批次**（5 个）：dsh-at-file · dsh-genui · dsh-automation · DSH-better-sidebar · ModLens——静态校验（R1 入口形态 + R2 patch YAML）全部通过，运行时验证（7/7 waterfall + tools/result）：**3 通过升级 ✅**（at-file / genui / modlens，报告已附），**2 标 ⓘ 环境边界**（automation inject `storageDomain` 等服务 headless 不提供、better-sidebar 缺 `lib/` 构建产物且 inject webServer 等 web 服务——均非插件行为缺陷，需在完整 web profile 复验）。静态注意项实测结论：genui 缺 `name` 导出（loader 用 entry id 兜底）与 modlens 走 `exports` 入口均**加载正常**，判定站 R1 的检测盲区已用运行时验证补上。
 
 > 你的插件还没在？[拿徽标只要 2 分钟](#插件作者投稿你的插件2-分钟上架)。
 
@@ -175,6 +176,9 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 | dsh-balance | [reports/balance-2026-08-14.json](reports/balance-2026-08-14.json) | ✅ |
 | dsh-repo-context | [reports/repo-context-2026-08-14.json](reports/repo-context-2026-08-14.json) | ✅ |
 | falsify-dsh | [reports/falsify-2026-08-14.json](reports/falsify-2026-08-14.json) | ✅ |
+| dsh-at-file | [reports/at-file-2026-08-15.json](reports/at-file-2026-08-15.json) | ✅ |
+| dsh-genui | [reports/genui-2026-08-15.json](reports/genui-2026-08-15.json) | ✅ |
+| ModLens | [reports/modlens-2026-08-15.json](reports/modlens-2026-08-15.json) | ✅ |
 
 > 报告均为 2026-08-14 用修正后 CLI（rules[] + R3）绝对路径重验版本，非早期空转版本。
 
