@@ -18,13 +18,22 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 const KNOWN_CATEGORIES = [
-  '调试与观测',
-  '桌面与系统',
-  '安全与合规',
-  '效率与监控',
-  '编码开发',
-  '通讯集成',
-  '娱乐生活',
+  '管理基建',
+  '界面与体验',
+  '编码与开发',
+  '自动化',
+  '视觉',
+  '搜索与联网',
+  '记忆与上下文',
+  '调试与诊断',
+  '远程与访问',
+  '成本与用量',
+  '通知与提醒',
+  '终端与 TUI',
+  '安全与权限',
+  '模型与编排',
+  '导入与迁移',
+  '乐子与皮肤',
 ]
 
 function sha256(path) {

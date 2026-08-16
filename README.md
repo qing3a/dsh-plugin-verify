@@ -63,31 +63,13 @@
 
 > 更新于 2026-08-16 · 判定方法：[dsh-plugin-verify CLI](#插件作者投稿你的插件2-分钟上架)
 >
-> 判定站已验证插件与社区推荐候选的**统一选型目录**。每行「状态」三态：**✅ 已验证**（通过 7/7 waterfall + tools/result 运行时复验，报告可复现）· **ⓘ 环境边界**（headless 判定环境缺其依赖服务，属判定方法边界而非插件缺陷，需 web profile 复验）· **候选**（尚未经判定站验证，标注 ⭐ 的为核查时点实测 Star 数，会随生态漂移）。完整状态语义见[状态体系](#-状态体系)。
+> 判定站已验证插件与社区推荐候选的**统一选型目录**（基于 YELEBAI 2890 插件 / 0xsline 989 插件 / awesome 等生态数据建模，2026-08-16）。每行「状态」三态：**✅ 已验证**（通过 7/7 waterfall + tools/result 运行时复验，报告可复现）· **ⓘ 环境边界**（headless 判定环境缺其依赖服务，属判定方法边界而非插件缺陷，需 web profile 复验）· **候选**（尚未经判定站验证，标注 ⭐ 的为核查时点实测 Star 数，会随生态漂移）。完整状态语义见[状态体系](#-状态体系)。
 
 **选型原则**：先装"管理基建"，再按你最痛的一两个场景补，别一次装很多。
 
-### 🏗 管理基建（Infrastructure）
-
-*插件市场、管理入口、备份——插件多了之后的底座*
-
-| 插件 | 状态 | 说明 | 验证日期 | 报告 |
-|---|---|---|---|---|
-| [dsh-market](https://github.com/dsh-market/dsh-market) | 候选 | 官方社区推荐的插件市场：设置页内浏览/搜索/分类筛选/一键安装，已装插件一目了然 | — | — |
-| [plugin-registry](https://github.com/vlln/plugin-registry) | 候选 | 可视化插件管理入口 + `make-dsh-plugin` 开发引导，新手首选 | — | — |
-| [dsh-backup](https://github.com/xiaoyuyu6420/dsh-backup) | 候选 | 一键备份/恢复 DSH 用户数据，定时自动备份，装插件多了之后是救命稻草 | — | — |
-
-### 🔧 调试与排障（Debug & Troubleshooting）
-
-*事件审计、会话诊断——让插件作者/开发者看清 harness 内部发生了什么*
-
-| 插件 | 状态 | 说明 | 验证日期 | 报告 |
-|---|---|---|---|---|
-| [dsh-event-auditor](https://github.com/qing3a/dsh-event-auditor) | ✅ | harness 事件流审计面板：事件类型/分发模式/计数；settings 热改 + /audit 命令 + headless dump | 2026-08-14 | [view](reports/event-auditor-2026-08-14.json) |
-
 ### 🖥 界面与体验（UI & Experience）
 
-*侧栏工作台、对话导航、UI 渲染——日常接触最多的界面层*
+*生态第一大场景：侧栏工作台、对话导航、UI 渲染、输入增强——用得顺手*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
@@ -97,15 +79,33 @@
 | [dsh-at-file](https://github.com/omdsh-dev/dsh-at-file) | ✅ | Codex 风格 @path 引用：对话里 `@路径` 解析为文件上下文（agent/pre-step 瀑布注入），客户端注入 ui-input-trigger/ui-slots | 2026-08-15 | [view](reports/at-file-2026-08-15.json) |
 | [dsh-genui](https://github.com/omdsh-dev/dsh-genui) | ✅ | ```dsh-ui fence 生成 UI：模型用 DSL 声明界面，client 渲染器 + settings.section 注册 | 2026-08-15 | [view](reports/genui-2026-08-15.json) |
 
-### 🔔 通知与盯守（Notification & Watch）
+### 👁 视觉（Vision）
 
-*回合完成通知、任务进度、系统托盘——长任务不用盯屏*
+*让纯文本模型"看得见"：图片问答、OCR、UI 还原——生态第二梯队热点（modlens 2208★）*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
-| [dsh-notification](https://github.com/omdsh-dev/dsh-notification) | ✅ | 回合完成桌面通知：成功/失败/关键词过滤，长任务不用盯屏 | 2026-08-16 | [view](reports/notification-2026-08-16.json) |
-| [dsh-task-status](https://github.com/vlln/dsh-task-status) | ⓘ | 后台任务进度 + 实时输出 tail 显示在对话页，构建/下载/测试时不用干瞪眼；必选注入 `webServer`，headless 未激活 | 2026-08-16 | — |
-| [dsh-tray](https://github.com/qing3a/dsh-tray) | ✅ | Windows 系统托盘（trayicon exe 宿主，无 native 编译）：菜单/通知/headless 降级 | 2026-08-14 | [view](reports/tray-2026-08-14.json) |
+| [ModLens](https://github.com/liustack/modlens) | ✅ | 首个 DSH 视觉插件：聊天直接粘贴图片 → 文本模型获得视觉（image→文本引擎），注入 tools/agents/attachments/llm（入口走 package.json `exports` 而非 `main`，实测加载正常） | 2026-08-15 | [view](reports/modlens-2026-08-15.json) |
+| [dsh-vision-toolkit](https://github.com/Anionex/dsh-vision-toolkit) | 候选（⭐405） | 图片问答、长截图 OCR、UI 还原、像素对比，适合前端/视觉任务 | — | — |
+
+### 🔍 搜索与联网（Search & Web）
+
+*搜得到：网页搜索、抓取、带引用证据——与视觉组成"看+搜"组合*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [modsearch](https://github.com/liustack/modsearch) | ✅ | 搜索网页和 X，返回带引用的结构化证据；注入 tools/web（与 ModLens 组成"看+搜"组合） | 2026-08-16 | [view](reports/modsearch-2026-08-16.json) |
+| [anweat/dsh-web-search-pro](https://github.com/anweat/dsh-web-search-pro) | 候选 | 多引擎+缓存的搜索后端增强 | — | — |
+| [TonyDua/dsh-web-search-exa](https://github.com/TonyDua/dsh-web-search-exa) | 候选 | 零配置 Exa 搜索后端 | — | — |
+
+### 💻 编码与开发（Coding & Dev）
+
+*git 集成、代码审查、CLI 适配、测试——写代码的帮手（生态最大类）*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [dsh-repo-context](https://github.com/qing3a/dsh-repo-context) | ✅ | 把 git 状态与仓库规范动态注入 system prompt（section/context/variable，官方缝隙插件） | 2026-08-14 | [view](reports/repo-context-2026-08-14.json) |
+| [falsify-dsh](https://github.com/shi275773124/falsify-dsh) | ✅ | Falsify CLI 适配器：裁决收据（lint / review --json / gate） | 2026-08-14 | [view](reports/falsify-2026-08-14.json) |
 
 ### ⚙️ 自动化（Automation）
 
@@ -118,18 +118,44 @@
 | [dsh-loop](https://github.com/vlln/dsh-loop) | 候选 | `/loop` 定时循环 | — | — |
 | [dsh-auto-continue](https://github.com/HsiangNianian/dsh-auto-continue) | 候选 | 网络波动/超时导致回合失败后自动发"继续"续跑，无人值守必备 | — | — |
 
-### 💻 编码与仓库（Coding & Repo）
+### 💾 记忆与上下文（Memory & Context）
 
-*代码操作、git 集成、终端、文档生成、工具适配器*
+*长期记忆、记忆主权、上下文优化——跨会话经验累积*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
-| [dsh-repo-context](https://github.com/qing3a/dsh-repo-context) | ✅ | 把 git 状态与仓库规范动态注入 system prompt（section/context/variable，官方缝隙插件） | 2026-08-14 | [view](reports/repo-context-2026-08-14.json) |
-| [falsify-dsh](https://github.com/shi275773124/falsify-dsh) | ✅ | Falsify CLI 适配器：裁决收据（lint / review --json / gate） | 2026-08-14 | [view](reports/falsify-2026-08-14.json) |
+| [dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve) | ✅ | 纯插件五轨长期记忆 + 技能自进化，零核心修改、卸载即净（注入 tools/systemPrompt/agents/settings 等 8 服务，headless 全激活） | 2026-08-16 | [view](reports/memory-evolve-2026-08-16.json) |
+| [dsh-mneme](https://github.com/modusensus/dsh-mneme) | 候选 | SQLite + 可人工编辑的 Markdown 镜像，记忆透明可改（"记忆主权"派） | — | — |
 
-### 🔒 安全与合规（Security & Compliance）
+### 🛠 调试与诊断（Debug & Diagnostics）
 
-*密钥扫描、危险模式检测、合规工具——装第三方插件前建议先有*
+*事件审计、会话诊断——让插件作者/开发者看清 harness 内部发生了什么*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [dsh-event-auditor](https://github.com/qing3a/dsh-event-auditor) | ✅ | harness 事件流审计面板：事件类型/分发模式/计数；settings 热改 + /audit 命令 + headless dump | 2026-08-14 | [view](reports/event-auditor-2026-08-14.json) |
+
+### 🔔 通知与提醒（Notification & Reminder）
+
+*回合完成通知、任务进度、系统托盘——长任务不用盯屏*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [dsh-notification](https://github.com/omdsh-dev/dsh-notification) | ✅ | 回合完成桌面通知：成功/失败/关键词过滤，长任务不用盯屏 | 2026-08-16 | [view](reports/notification-2026-08-16.json) |
+| [dsh-task-status](https://github.com/vlln/dsh-task-status) | ⓘ | 后台任务进度 + 实时输出 tail 显示在对话页，构建/下载/测试时不用干瞪眼；必选注入 `webServer`，headless 未激活 | 2026-08-16 | — |
+| [dsh-tray](https://github.com/qing3a/dsh-tray) | ✅ | Windows 系统托盘（trayicon exe 宿主，无 native 编译）：菜单/通知/headless 降级 | 2026-08-14 | [view](reports/tray-2026-08-14.json) |
+
+### 💰 成本与用量（Cost & Usage）
+
+*Token 消耗、账户余额、预算——成本与资源可见性*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [dsh-balance](https://github.com/TwotwoPiggy/dsh-balance) | ✅ | Web 聊天框实时 Token 消耗估算 + DeepSeek 账户余额（纯 JS，ctx.inject 动态注入） | 2026-08-14 | [view](reports/balance-2026-08-14.json) |
+
+### 🔒 安全与权限（Security & Permissions）
+
+*密钥扫描、权限规则、恶意模式检测——装第三方插件前建议先有*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
@@ -138,38 +164,51 @@
 | [dsh-mcpguard](https://github.com/ChenLaoshiYF/dsh-mcpguard) | 候选 | 扫描 skill 与 MCP 配置中的提示注入、同形字、危险 shell | — | — |
 | [dsh-permission-rules](https://github.com/PerryLink/dsh-permission-rules) | 候选 | Claude Code 风格声明式权限规则（allow/deny/ask） | — | — |
 
-### 📊 效率（Productivity）
+### 🏗 管理基建（Infrastructure）
 
-*Token 消耗、账户余额——成本与资源可见性*
-
-| 插件 | 状态 | 说明 | 验证日期 | 报告 |
-|---|---|---|---|---|
-| [dsh-balance](https://github.com/TwotwoPiggy/dsh-balance) | ✅ | Web 聊天框实时 Token 消耗估算 + DeepSeek 账户余额（纯 JS，ctx.inject 动态注入） | 2026-08-14 | [view](reports/balance-2026-08-14.json) |
-
-### 🧠 模型能力（Model Capabilities）
-
-*视觉、搜索——补足纯文本模型缺失的模态*
+*插件市场、管理入口、备份——插件多了之后的底座*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
-| [ModLens](https://github.com/liustack/modlens) | ✅ | 首个 DSH 视觉插件：聊天直接粘贴图片 → 文本模型获得视觉（image→文本引擎），注入 tools/agents/attachments/llm（入口走 package.json `exports` 而非 `main`，实测加载正常） | 2026-08-15 | [view](reports/modlens-2026-08-15.json) |
-| [modsearch](https://github.com/liustack/modsearch) | ✅ | 搜索网页和 X，返回带引用的结构化证据；注入 tools/web（与 ModLens 组成"看+搜"组合） | 2026-08-16 | [view](reports/modsearch-2026-08-16.json) |
-| [dsh-vision-toolkit](https://github.com/Anionex/dsh-vision-toolkit) | 候选（⭐405） | 图片问答、长截图 OCR、UI 还原、像素对比，适合前端/视觉任务 | — | — |
-| [anweat/dsh-web-search-pro](https://github.com/anweat/dsh-web-search-pro) | 候选 | 多引擎+缓存的搜索后端增强 | — | — |
-| [TonyDua/dsh-web-search-exa](https://github.com/TonyDua/dsh-web-search-exa) | 候选 | 零配置 Exa 搜索后端 | — | — |
+| [dsh-market](https://github.com/dsh-market/dsh-market) | 候选 | 官方社区推荐的插件市场：设置页内浏览/搜索/分类筛选/一键安装，已装插件一目了然 | — | — |
+| [plugin-registry](https://github.com/vlln/plugin-registry) | 候选 | 可视化插件管理入口 + `make-dsh-plugin` 开发引导，新手首选 | — | — |
+| [dsh-backup](https://github.com/xiaoyuyu6420/dsh-backup) | 候选 | 一键备份/恢复 DSH 用户数据，定时自动备份，装插件多了之后是救命稻草 | — | — |
 
-### 💾 记忆（Memory）
+### 🌐 远程与访问（Remote & Access）
 
-*长期记忆、会话持久化、记忆主权——跨会话经验累积*
+*局域网访问、反向代理、远程控制——生态热点（149 插件），待收录*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
-| [dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve) | ✅ | 纯插件五轨长期记忆 + 技能自进化，零核心修改、卸载即净（注入 tools/systemPrompt/agents/settings 等 8 服务，headless 全激活） | 2026-08-16 | [view](reports/memory-evolve-2026-08-16.json) |
-| [dsh-mneme](https://github.com/modusensus/dsh-mneme) | 候选 | SQLite + 可人工编辑的 Markdown 镜像，记忆透明可改（"记忆主权"派） | — | — |
+| *待收录* | — | 生态已有 dsh-lan-access / dsh-full-remote / dsh-web-access 等热点插件，验证后收录于此 | — | — |
 
-### 🎮 乐子（Fun）
+### ⌨️ 终端与 TUI（Terminal & TUI）
 
-*桌面宠物、摸鱼游戏、音乐——按需*
+*终端界面、命令行增强——高星集中（dsh-TUI 1441★），待收录*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| *待收录* | — | 生态已有 dsh-TUI / dsh-bash-terminal 等热点插件，验证后收录于此 | — | — |
+
+### 🧠 模型与编排（Models & Orchestration）
+
+*子代理委派、模型切换/回退、桥接——让模型编排更灵活，待收录*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| *待收录* | — | 生态已有 dsh-subagent-max / dsh-llm-fallback 等热点插件，验证后收录于此 | — | — |
+
+### 📦 导入与迁移（Import & Migration）
+
+*从 Claude Code/Codex/ChatGPT 等迁移会话——硬需求，待收录*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| *待收录* | — | 生态已有 dsh-claude-move / dsh-chat-import（13 源全保真导入）等，验证后收录于此 | — | — |
+
+### 🎮 乐子与皮肤（Fun & Themes）
+
+*桌面宠物、摸鱼游戏、皮肤美化——按需*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
@@ -318,14 +357,15 @@ npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
 
 **投稿方式**（任选）：
 - **用投稿 Skill（推荐，agent 友好）**：读 [skills/submission/SKILL.md](skills/submission/SKILL.md)——按 6 步流程生成提交包（manifest + self_check + verify-report），跑 [check-submission.mjs](scripts/check-submission.mjs) 自检 gate，通过后提 PR。DSH 生态的 agent 作者可直接遵循此 skill 自动投稿。
-- **提 PR**：在 `index.html` 的对应分类表格加一行（含报告链接）
+- **提 PR**：按提交包模板在 `submissions/<owner>/<plugin>/` 建三个文件（manifest + self_check + verify-report），自检 gate 通过后提 PR（只改自己的 `submissions/` 路径，场景目录与主页收录由维护者复核时同步）
 - **提 Issue**：附上 `verify-report.json` 链接，说明插件名/仓库/分类/一句话描述
 
 **为什么要投稿**：
 - 在 288+ 个插件的"待测/未知"海洋里，✅ 徽标让你**脱颖而出**
 - 验证会**帮你发现真实 bug**（[dsh-sentinel 案例](https://github.com/fuhefei/dsh-sentinel/issues/4)：headless 加载失败被验证工具抓出）
 - 报告可直接作为 [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) 登记 PR 的运行实测证据（其 L4 层）
-- 收录进分类目录 → 用户/AI 按功能找你 → 被安装
+- 收录进场景目录 → 用户/AI 按场景找你 → 被安装
+- **双目录曝光**：验证通过的插件已被 [bradeGithub/DSH-Plugins-Marketplace](https://github.com/bradeGithub/DSH-Plugins-Marketplace) 等对接 `verified.json` 开放数据层的市场自动盖上「已验证」徽章（2026-08-16 已对接）
 
 **收录条件**：公开仓库 + `dsh-plugin` topic + 合法 package.json + 运行时依赖声明 + 许可证 + README（含安装/卸载/最小示例）。命名用你有权控制的 scope，不占 `@deepseek-ai/*` 保留命名空间。
 
