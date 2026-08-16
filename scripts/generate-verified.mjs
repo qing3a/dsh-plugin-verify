@@ -100,6 +100,7 @@ for (const f of files) {
     name,
     fullName,
     repo: repoUrl ?? null,
+    verdict: 'pass',
     verifiedBy: report.verifiedBy ?? 'dsh-plugin-verify',
     verifiedAt: date,
     reportUrl,
