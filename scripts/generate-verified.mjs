@@ -73,7 +73,24 @@ for (const f of files) {
     reportUrl: `https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/${f}`,
     waterfall: `${report.waterfallFound.length}/7`,
     toolsResult: report.detail?.includes('tools/result: 是') ?? false,
+    security: extractSecurity(report),
   })
+}
+
+/**
+ * 安全维度：提取报告中的静态安全规则结果（P202 裸 spawn / P401 single 槽）。
+ * 报告未含这些规则（旧 CLI 产物）→ null（未评估），不误报 "OK"。
+ */
+function extractSecurity(report) {
+  const secRules = (report.rules || []).filter((r) => r.name?.startsWith('P202') || r.name?.startsWith('P401'))
+  if (secRules.length === 0) return null
+  const warnings = secRules
+    .filter((r) => r.warn)
+    .map((r) => ({ rule: r.name, detail: (r.detail || '').slice(0, 160) }))
+  return {
+    status: warnings.length === 0 ? 'clean' : 'warnings',
+    warnings,
+  }
 }
 
 // 排序：按验证日期升序（最早在前，稳定输出）
