@@ -37,6 +37,7 @@
 | **评审清单** | 人工评审层：官方 defensive-patterns + postmortem 检查点 | [docs/review-checklist.md](docs/review-checklist.md) |
 | **审核标准** | 评审标准总纲 v0.1.0：P（插件必检）/D（dsh-desktop 基线）/C（官方贡献）三集规则，钉定 mainline `47f94385`，含版本规程与溯源修正 | [docs/review-standards.md](docs/review-standards.md) |
 | **验证报告** | 14 份可复现报告（插件 commit · mainline commit · 验证日期） | [reports/](#资源中心) |
+| **报告 Schema** | 验证报告机器可读规范 v1（fullName 映射键 · verifiedBy · schemaVersion · security，市场/索引/CI 可消费） | [schema/report.schema.json](schema/report.schema.json) |
 | **文章** | 从零拆解 / 踩坑全记录 / 验证实战 / 判定站从零到跑通（4 篇） | [posts/](#文章) |
 | **投稿系统** | Agent 友好的 6 步投稿 Skill + 自检 gate | [skills/submission/SKILL.md](skills/submission/SKILL.md) |
 
