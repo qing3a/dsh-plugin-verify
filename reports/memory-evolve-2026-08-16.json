@@ -1,0 +1,45 @@
+{
+  "plugin": "C:/Users/Administrator/AppData/Local/Temp/cand2/dsh-memory-evolve/csyangwen-dsh-memory-evolve-ce7f0fa//",
+  "repo": "C:\\Users\\Administrator\\Desktop\\ds\\deepseek-harness",
+  "date": "2026-08-16T06:11:53.482Z",
+  "pass": true,
+  "waterfallFound": [
+    "system-prompt/assemble",
+    "agent/pre-step",
+    "agent/request",
+    "llm/stream",
+    "tools/pre-execute",
+    "tools/execute",
+    "tools/post-execute"
+  ],
+  "waterfallMissing": [],
+  "rules": [
+    {
+      "name": "R1-entry-shape",
+      "pass": true,
+      "detail": "入口 C:\\Users\\Administrator\\AppData\\Local\\Temp\\cand2\\dsh-memory-evolve\\csyangwen-dsh-memory-evolve-ce7f0fa\\lib\\index.js：namespace 形式 ✓ 且无裸 export default"
+    },
+    {
+      "name": "R2-patch-yaml",
+      "pass": true,
+      "detail": "无 dsh.bundle.patch（工具型插件，静态 YAML 规则不适用）"
+    },
+    {
+      "name": "P202-spawn-usage",
+      "pass": true,
+      "warn": true,
+      "detail": "⚠️ [SHOULD P-202] 1 个运行时文件裸 import child_process + spawn——不经 ctx.subprocess 的子进程逃逸 host-exit 同步回收，建议改经 ctx.subprocess 管理: lib\\index.js"
+    },
+    {
+      "name": "P401-single-slot",
+      "pass": true,
+      "detail": "P-401 未见 single 槽注册（slots.register 未命中官方 single 槽清单）"
+    },
+    {
+      "name": "R3-tools-result",
+      "pass": true,
+      "detail": "工具真实执行成功（1 次结果，无 isError）"
+    }
+  ],
+  "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是"
+}

@@ -2,7 +2,7 @@
 
 > DSH 插件**判定站**：每个插件经过同一套运行时验证（7/7 waterfall + tools/result），通过才给 ✅ Verified 徽标。**与 awesome-dsh-plugins（全量分级观测）互补：它做 L0-L4 全量观测分级，我们把 L4 运行实测做深（7/7 waterfall + tools/result）。**
 
-![verified](https://img.shields.io/badge/Verified%20插件-12-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![reports](https://img.shields.io/badge/可复现报告-12-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
+![verified](https://img.shields.io/badge/Verified%20插件-14-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![reports](https://img.shields.io/badge/可复现报告-14-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
 
 - **找可信插件**：按功能分类浏览，每个插件带 Verified 徽标 + 验证日期 + 可复现报告——证据可复现的运行时验证（7/7 waterfall + tools/result）
 - **装得放心**：徽标 = 通过了完整 agent 循环审查；附带安装指引与安全提示
@@ -36,7 +36,7 @@
 | **插件规范建议** | 《DSH 插件开发与设计规范建议 v0.1》（每条带依据与踩坑记录） | [docs/plugin-standards.md](docs/plugin-standards.md) |
 | **评审清单** | 人工评审层：官方 defensive-patterns + postmortem 检查点 | [docs/review-checklist.md](docs/review-checklist.md) |
 | **审核标准** | 评审标准总纲 v0.1.0：P（插件必检）/D（dsh-desktop 基线）/C（官方贡献）三集规则，钉定 mainline `47f94385`，含版本规程与溯源修正 | [docs/review-standards.md](docs/review-standards.md) |
-| **验证报告** | 12 份可复现报告（插件 commit · mainline commit · 验证日期） | [reports/](#资源中心) |
+| **验证报告** | 14 份可复现报告（插件 commit · mainline commit · 验证日期） | [reports/](#资源中心) |
 | **文章** | 从零拆解 / 踩坑全记录 / 验证实战 / 判定站从零到跑通（4 篇） | [posts/](#文章) |
 | **投稿系统** | Agent 友好的 6 步投稿 Skill + 自检 gate | [skills/submission/SKILL.md](skills/submission/SKILL.md) |
 
@@ -123,6 +123,17 @@
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
 | [ModLens](https://github.com/liustack/modlens) | ✅ | 首个 DSH 视觉插件：聊天直接粘贴图片 → 文本模型获得视觉（image→文本引擎），注入 tools/agents/attachments/llm（入口走 package.json `exports` 而非 `main`，实测加载正常） | 2026-08-15 | [view](reports/modlens-2026-08-15.json) |
+| [modsearch](https://github.com/liustack/modsearch) | ✅ | 搜索网页和 X，返回带引用的结构化证据；注入 tools/web（与 ModLens 组成"看+搜"组合） | 2026-08-16 | [view](reports/modsearch-2026-08-16.json) |
+
+### 🧠 跨会话记忆（Cross-session Memory）
+
+*长期记忆、会话持久化、记忆主权——跨会话经验累积*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve) | ✅ | 纯插件五轨长期记忆 + 技能自进化，零核心修改、卸载即净（注入 tools/systemPrompt/agents/settings 等 8 服务，headless 全激活） | 2026-08-16 | [view](reports/memory-evolve-2026-08-16.json) |
+
+> **2026-08-16 第二批次**（推荐清单缺口，4 个候选）：**dsh-memory-evolve ✅ + modsearch ✅**（均 7/7 waterfall 通过，报告已附，推荐清单同步升级）；**dsh-task-status ⓘ + dsh-web-ui ⓘ**（依赖 web 环境服务，headless 无法激活——task-status 必选注入 `webServer`，web-ui 为重度 web 前端包，均属判定方法边界，非插件缺陷）。
 
 > **2026-08-16 收录批次**（3 个，全部 ✅）：dsh-sentinel（v0.10.0）· dsh-navbar（v0.3.0）· dsh-notification（v0.1.1）——均为运行时验证 7/7 waterfall + tools/result 通过（报告已附）。sentinel 的修复正是判定站 #4 建议的产物（webServer 移出必选 inject + heartbeat unref），作者先自测通过、判定站独立复验一致，形成"验证 → 作者采纳 → 生态受益"完整闭环；navbar/notification 为推荐清单候选，验证通过后升级为已验证推荐。
 
@@ -149,17 +160,17 @@
 ### 🥈 日常体验（几乎人人都受益）
 
 - **[DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar)**（⭐1k）— 把侧边栏升级成工作台：内置文件渲染编辑、终端、Git 与子代理。目前最受欢迎的增强。
-- **[dsh-task-status](https://github.com/vlln/dsh-task-status)** — 后台任务进度 + 实时输出 tail 显示在对话页，构建/下载/测试时不用干瞪眼。
+- **[dsh-task-status](https://github.com/vlln/dsh-task-status)** ⓘ — 后台任务进度 + 实时输出 tail 显示在对话页，构建/下载/测试时不用干瞪眼。*判定站 ⓘ：必选注入 `webServer`，headless 未激活，需 web profile 复验*
 - **[dsh-notification](https://github.com/omdsh-dev/dsh-notification)** ✅ — 回合完成发桌面通知，可按成功/失败/关键词过滤，长任务不用盯屏。*判定站 ✅：v0.1.1 复验 7/7 waterfall（2026-08-16）*
 - **[dsh-navbar](https://github.com/vlln/dsh-navbar)** ✅ — 长对话快速跳转任意用户消息节点。*判定站 ✅：v0.3.0 复验 7/7 waterfall（2026-08-16）*
 - **[dsh-at-file](https://github.com/omdsh-dev/dsh-at-file)** — 输入框里按 `@` 搜索工作区文件并附进 prompt，免去手动复制粘贴。
 - **[dsh-genui](https://github.com/omdsh-dev/dsh-genui)** — 在回复中直接渲染图表、表单、Mermaid、3D 场景，且用户操作能回送模型。
-- 想要"一次装齐"的可以看 **[dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui)**（⭐2.4k，生态最高星）：任务看板、Git 关系图、皮肤中心、桌面宠物、token 统计一站式合集
+- 想要"一次装齐"的可以看 **[dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui)** ⓘ（⭐2.4k，生态最高星）：任务看板、Git 关系图、皮肤中心、桌面宠物、token 统计一站式合集。*判定站 ⓘ：重度 web 前端包，headless 未激活*
 
 ### 🥉 让模型"看得见、搜得到"（纯文本模型的刚需）
 
 - **[ModLens](https://github.com/liustack/modlens)** ✅（⭐1.7k）— 粘贴图片即得 OCR/布局/语义结构化证据，让纯文本模型可靠看图
-- **[modsearch](https://github.com/liustack/modsearch)** — 搜索网页和 X，返回带引用的结构化证据，与 modlens 组成"看+搜"组合
+- **[modsearch](https://github.com/liustack/modsearch)** ✅ — 搜索网页和 X，返回带引用的结构化证据，与 modlens 组成"看+搜"组合。*判定站 ✅：v5.4.2 复验 7/7 waterfall（2026-08-16）*
 - **[dsh-vision-toolkit](https://github.com/Anionex/dsh-vision-toolkit)**（⭐405）— 图片问答、长截图 OCR、UI 还原、像素对比，适合前端/视觉任务
 - 搜索后端增强：[anweat/dsh-web-search-pro](https://github.com/anweat/dsh-web-search-pro)（多引擎+缓存）、[TonyDua/dsh-web-search-exa](https://github.com/TonyDua/dsh-web-search-exa)（零配置 Exa）
 
@@ -171,7 +182,7 @@
 
 ### 🧠 跨会话记忆
 
-- **[dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve)** — 纯插件五轨长期记忆 + 技能自进化，零核心修改、卸载即净
+- **[dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve)** ✅ — 纯插件五轨长期记忆 + 技能自进化，零核心修改、卸载即净。*判定站 ✅：v0.1.0 复验 7/7 waterfall（2026-08-16）*
 - **[dsh-mneme](https://github.com/modusensus/dsh-mneme)** — SQLite + 可人工编辑的 Markdown 镜像，记忆透明可改（"记忆主权"派）
 
 ### 🔒 安全相关（装第三方插件前建议先有）
@@ -254,8 +265,10 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 | dsh-sentinel | [reports/sentinel-2026-08-16.json](reports/sentinel-2026-08-16.json) | ✅ |
 | dsh-navbar | [reports/navbar-2026-08-16.json](reports/navbar-2026-08-16.json) | ✅ |
 | dsh-notification | [reports/notification-2026-08-16.json](reports/notification-2026-08-16.json) | ✅ |
+| modsearch | [reports/modsearch-2026-08-16.json](reports/modsearch-2026-08-16.json) | ✅ |
+| dsh-memory-evolve | [reports/memory-evolve-2026-08-16.json](reports/memory-evolve-2026-08-16.json) | ✅ |
 
-> 报告均为 2026-08-14 用修正后 CLI（rules[] + R3）绝对路径重验版本，非早期空转版本；2026-08-16 三份（sentinel/navbar/notification）为当日独立复验。
+> 报告均为 2026-08-14 用修正后 CLI（rules[] + R3）绝对路径重验版本，非早期空转版本；2026-08-16 五份（sentinel/navbar/notification/modsearch/memory-evolve）为当日独立复验。
 
 ### 工具与脚本
 

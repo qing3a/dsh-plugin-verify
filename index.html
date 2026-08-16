@@ -50,7 +50,7 @@
 
 <!-- 数字卡片 -->
 <div class="cards">
-  <div class="card green"><div class="num">12</div><div class="lbl">Verified 插件</div></div>
+  <div class="card green"><div class="num">14</div><div class="lbl">Verified 插件</div></div>
   <div class="card"><div class="num">100%</div><div class="lbl">判定=运行时实测</div></div>
   <div class="card"><div class="num">2026-08-16</div><div class="lbl">最近验证</div></div>
   <div class="card"><div class="num">7/7</div><div class="lbl">waterfall 判定标准</div></div>
@@ -190,6 +190,59 @@
   <td>Falsify CLI 适配器：裁决收据（lint / review --json / gate）</td>
   <td>2026-08-14</td>
   <td><a href="reports/falsify-2026-08-14.json">view</a></td>
+</tr>
+<tr>
+  <td><a href="https://github.com/omdsh-dev/dsh-at-file"><code>dsh-at-file</code></a></td>
+  <td><span class="badge b-verified">✓ Verified</span></td>
+  <td>Codex 风格 @path 引用：对话里 @路径 解析为文件上下文（agent/pre-step 瀑布注入）</td>
+  <td>2026-08-15</td>
+  <td><a href="reports/at-file-2026-08-15.json">view</a></td>
+</tr>
+<tr>
+  <td><a href="https://github.com/omdsh-dev/dsh-genui"><code>dsh-genui</code></a></td>
+  <td><span class="badge b-verified">✓ Verified</span></td>
+  <td>dsh-ui fence 生成 UI：模型用 DSL 声明界面，client 渲染器 + settings.section 注册</td>
+  <td>2026-08-15</td>
+  <td><a href="reports/genui-2026-08-15.json">view</a></td>
+</tr>
+</tbody>
+</table>
+</details>
+
+<details>
+<summary>🧠 模型能力增强（Model Capabilities）</summary>
+<table>
+<thead><tr><th>插件</th><th>状态</th><th>说明</th><th>验证日期</th><th>报告</th></tr></thead>
+<tbody>
+<tr>
+  <td><a href="https://github.com/liustack/modlens"><code>ModLens</code></a></td>
+  <td><span class="badge b-verified">✓ Verified</span></td>
+  <td>首个 DSH 视觉插件：聊天直接粘贴图片 → 文本模型获得视觉（image→文本引擎）</td>
+  <td>2026-08-15</td>
+  <td><a href="reports/modlens-2026-08-15.json">view</a></td>
+</tr>
+<tr>
+  <td><a href="https://github.com/liustack/modsearch"><code>modsearch</code></a></td>
+  <td><span class="badge b-verified">✓ Verified</span></td>
+  <td>搜索网页和 X，返回带引用的结构化证据（注入 tools/web）</td>
+  <td>2026-08-16</td>
+  <td><a href="reports/modsearch-2026-08-16.json">view</a></td>
+</tr>
+</tbody>
+</table>
+</details>
+
+<details>
+<summary>🧠 跨会话记忆（Cross-session Memory）</summary>
+<table>
+<thead><tr><th>插件</th><th>状态</th><th>说明</th><th>验证日期</th><th>报告</th></tr></thead>
+<tbody>
+<tr>
+  <td><a href="https://github.com/csyangwen/dsh-memory-evolve"><code>dsh-memory-evolve</code></a></td>
+  <td><span class="badge b-verified">✓ Verified</span></td>
+  <td>纯插件五轨长期记忆 + 技能自进化，零核心修改、卸载即净</td>
+  <td>2026-08-16</td>
+  <td><a href="reports/memory-evolve-2026-08-16.json">view</a></td>
 </tr>
 </tbody>
 </table>
