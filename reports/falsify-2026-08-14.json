@@ -30,5 +30,10 @@
       "detail": "工具真实执行成功（1 次结果，无 isError）"
     }
   ],
-  "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是"
+  "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是",
+  "fullName": "shi275773124/falsify-dsh",
+  "verifiedBy": "dsh-plugin-verify@0.1.2",
+  "schemaVersion": 1,
+  "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/falsify-2026-08-14.json",
+  "security": null
 }
