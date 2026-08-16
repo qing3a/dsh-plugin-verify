@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-16T06:49:46.827Z",
+  "generatedAt": "2026-08-16T07:23:10.866Z",
   "description": "DSH 插件运行时验证开放数据层（dsh-plugin-verify 判定站产出）",
   "verifiedBy": "dsh-plugin-verify",
   "reportBaseUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/",
@@ -12,7 +12,8 @@
       "verifiedAt": "2026-08-14",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/balance-2026-08-14.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": null
     },
     {
       "name": "dsh-event-auditor",
@@ -21,7 +22,8 @@
       "verifiedAt": "2026-08-14",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/event-auditor-2026-08-14.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": null
     },
     {
       "name": "falsify-dsh",
@@ -30,7 +32,8 @@
       "verifiedAt": "2026-08-14",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/falsify-2026-08-14.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": null
     },
     {
       "name": "dsh-repo-context",
@@ -39,7 +42,8 @@
       "verifiedAt": "2026-08-14",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/repo-context-2026-08-14.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": null
     },
     {
       "name": "dsh-security-scan",
@@ -48,7 +52,8 @@
       "verifiedAt": "2026-08-14",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/security-scan-2026-08-14.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": null
     },
     {
       "name": "dsh-tray",
@@ -57,7 +62,8 @@
       "verifiedAt": "2026-08-14",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/tray-2026-08-14.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": null
     },
     {
       "name": "dsh-at-file",
@@ -66,7 +72,8 @@
       "verifiedAt": "2026-08-15",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/at-file-2026-08-15.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": null
     },
     {
       "name": "dsh-genui",
@@ -75,7 +82,8 @@
       "verifiedAt": "2026-08-15",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/genui-2026-08-15.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": null
     },
     {
       "name": "ModLens",
@@ -84,7 +92,8 @@
       "verifiedAt": "2026-08-15",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/modlens-2026-08-15.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": null
     },
     {
       "name": "dsh-memory-evolve",
@@ -93,7 +102,16 @@
       "verifiedAt": "2026-08-16",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/memory-evolve-2026-08-16.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": {
+        "status": "warnings",
+        "warnings": [
+          {
+            "rule": "P202-spawn-usage",
+            "detail": "⚠️ [SHOULD P-202] 1 个运行时文件裸 import child_process + spawn——不经 ctx.subprocess 的子进程逃逸 host-exit 同步回收，建议改经 ctx.subprocess 管理: lib\\index.js"
+          }
+        ]
+      }
     },
     {
       "name": "modsearch",
@@ -102,7 +120,16 @@
       "verifiedAt": "2026-08-16",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/modsearch-2026-08-16.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": {
+        "status": "warnings",
+        "warnings": [
+          {
+            "rule": "P202-spawn-usage",
+            "detail": "⚠️ [SHOULD P-202] 1 个运行时文件裸 import child_process + spawn——不经 ctx.subprocess 的子进程逃逸 host-exit 同步回收，建议改经 ctx.subprocess 管理: dsh\\index.js"
+          }
+        ]
+      }
     },
     {
       "name": "dsh-navbar",
@@ -111,7 +138,11 @@
       "verifiedAt": "2026-08-16",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/navbar-2026-08-16.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": {
+        "status": "clean",
+        "warnings": []
+      }
     },
     {
       "name": "dsh-notification",
@@ -120,7 +151,11 @@
       "verifiedAt": "2026-08-16",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/notification-2026-08-16.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": {
+        "status": "clean",
+        "warnings": []
+      }
     },
     {
       "name": "dsh-sentinel",
@@ -129,7 +164,16 @@
       "verifiedAt": "2026-08-16",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/sentinel-2026-08-16.json",
       "waterfall": "7/7",
-      "toolsResult": true
+      "toolsResult": true,
+      "security": {
+        "status": "warnings",
+        "warnings": [
+          {
+            "rule": "P401-single-slot",
+            "detail": "⚠️ [SHOULD P-401] 1 处注册 single 槽——第三方 priority 恒低，注册即 shadow 官方 UI 并破坏其子槽声明（如 sidebar.workspaces.directoryFlow 链路）: src\\client\\index.tsx 注册 sidebar.workspaces.s"
+          }
+        ]
+      }
     }
   ]
 }
