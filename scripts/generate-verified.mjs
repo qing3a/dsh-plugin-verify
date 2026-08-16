@@ -94,10 +94,12 @@ for (const f of files) {
 
   entries.push({
     name,
+    fullName,
     repo: repoUrl ?? null,
     verifiedBy: report.verifiedBy ?? 'dsh-plugin-verify',
     verifiedAt: date,
     reportUrl,
+    schemaVersion: 1,
     waterfall: `${report.waterfallFound.length}/7`,
     toolsResult: report.detail?.includes('tools/result: 是') ?? false,
     security,
