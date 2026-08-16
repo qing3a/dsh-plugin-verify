@@ -35,6 +35,8 @@ const REPO_MAP = {
   'notification': 'https://github.com/omdsh-dev/dsh-notification',
   'modsearch': 'https://github.com/liustack/modsearch',
   'memory-evolve': 'https://github.com/csyangwen/dsh-memory-evolve',
+  'hub-panel': 'https://github.com/jiangxingfan1-coder/dsh-hub-panel',
+  'dsh-id': 'https://github.com/jiangxingfan1-coder/dsh-id',
 }
 
 /** 插件显示名（报告文件名前缀 → 插件名） */
@@ -53,6 +55,8 @@ const NAME_MAP = {
   'notification': 'dsh-notification',
   'modsearch': 'modsearch',
   'memory-evolve': 'dsh-memory-evolve',
+  'hub-panel': 'dsh-hub-panel',
+  'dsh-id': 'dsh-id',
 }
 
 const files = readdirSync(reportsDir).filter((f) => f.endsWith('.json') && !f.startsWith('.'))

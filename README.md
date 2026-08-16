@@ -170,6 +170,8 @@
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
+| [dsh-hub-panel](https://github.com/jiangxingfan1-coder/dsh-hub-panel) | ✅ | Settings 页插件商店 UI（dual-face，client slot 注册 + fetch 行为）——首个通过运行时验证的双面插件（v0.1.0） | 2026-08-16 | [view](reports/hub-panel-2026-08-16.json) |
+| [dsh-id](https://github.com/jiangxingfan1-coder/dsh-id) | ✅ | 个人身份同步层（host 常驻：patch + 定时器 + 工具注册，v0.7.0） | 2026-08-16 | [view](reports/dsh-id-2026-08-16.json) |
 | [dsh-market](https://github.com/dsh-market/dsh-market) | 候选 | 官方社区推荐的插件市场：设置页内浏览/搜索/分类筛选/一键安装，已装插件一目了然 | — | — |
 | [plugin-registry](https://github.com/vlln/plugin-registry) | 候选 | 可视化插件管理入口 + `make-dsh-plugin` 开发引导，新手首选 | — | — |
 | [dsh-backup](https://github.com/xiaoyuyu6420/dsh-backup) | 候选 | 一键备份/恢复 DSH 用户数据，定时自动备份，装插件多了之后是救命稻草 | — | — |
@@ -220,7 +222,7 @@
 
 > ⚠️ **注意**：候选 = 未经判定站验证。这些全是第三方插件，会在你机器上运行代码。装之前看一眼仓库的源码、许可证和最近更新情况，优先装 Star 高、活跃维护的。安装方式一般是 `dsh plugin add <GitHub 仓库>` 或在市场里一键安装。**推荐 ≠ 判定站 Verified**——想让场景目录里哪个插件拿到 ✅ 徽标，走[投稿流程](#插件作者投稿你的插件2-分钟上架)，判定站免费帮你跑一遍运行时验证。
 
-> **收录批次**：2026-08-16 第二批次（4 个候选）：dsh-memory-evolve ✅ + modsearch ✅（均 7/7 waterfall 通过，报告已附）；dsh-task-status ⓘ + dsh-web-ui ⓘ（依赖 web 环境服务，headless 无法激活——task-status 必选注入 `webServer`，web-ui 为重度 web 前端包，均属判定方法边界，非插件缺陷）。2026-08-16 收录批次（3 个，全部 ✅）：dsh-sentinel（v0.10.0）· dsh-navbar（v0.3.0）· dsh-notification（v0.1.1）——sentinel 的修复正是判定站 #4 建议的产物（webServer 移出必选 inject + heartbeat unref），形成"验证 → 作者采纳 → 生态受益"完整闭环。2026-08-15 收录批次（5 个）：at-file/genui/modlens 通过升级 ✅，automation/better-sidebar 标 ⓘ（依赖 web 环境服务，headless 判定模式无法激活，需浏览器级验证通道，非插件缺陷）。
+> **收录批次**：2026-08-16 第三批次（2 个，全部 ✅）：dsh-hub-panel（dual-face 双面插件，v0.1.0）· dsh-id（host 常驻，v0.7.0）——dsh-hub-index（jiangxingfan1-coder）试点验证对象，报告已可作其 verified 晋级证据。2026-08-16 第二批次（4 个候选）：dsh-memory-evolve ✅ + modsearch ✅（均 7/7 waterfall 通过，报告已附）；dsh-task-status ⓘ + dsh-web-ui ⓘ（依赖 web 环境服务，headless 无法激活——task-status 必选注入 `webServer`，web-ui 为重度 web 前端包，均属判定方法边界，非插件缺陷）。2026-08-16 收录批次（3 个，全部 ✅）：dsh-sentinel（v0.10.0）· dsh-navbar（v0.3.0）· dsh-notification（v0.1.1）——sentinel 的修复正是判定站 #4 建议的产物（webServer 移出必选 inject + heartbeat unref），形成"验证 → 作者采纳 → 生态受益"完整闭环。2026-08-15 收录批次（5 个）：at-file/genui/modlens 通过升级 ✅，automation/better-sidebar 标 ⓘ（依赖 web 环境服务，headless 判定模式无法激活，需浏览器级验证通道，非插件缺陷）。
 
 > 你的插件还没在？[拿徽标只要 2 分钟](#插件作者投稿你的插件2-分钟上架)。
 
@@ -290,8 +292,10 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 | dsh-notification | [reports/notification-2026-08-16.json](reports/notification-2026-08-16.json) | ✅ |
 | modsearch | [reports/modsearch-2026-08-16.json](reports/modsearch-2026-08-16.json) | ✅ |
 | dsh-memory-evolve | [reports/memory-evolve-2026-08-16.json](reports/memory-evolve-2026-08-16.json) | ✅ |
+| dsh-hub-panel | [reports/hub-panel-2026-08-16.json](reports/hub-panel-2026-08-16.json) | ✅ |
+| dsh-id | [reports/dsh-id-2026-08-16.json](reports/dsh-id-2026-08-16.json) | ✅ |
 
-> 报告均为 2026-08-14 用修正后 CLI（rules[] + R3）绝对路径重验版本，非早期空转版本；2026-08-16 五份（sentinel/navbar/notification/modsearch/memory-evolve）为当日独立复验。
+> 报告均为 2026-08-14 用修正后 CLI（rules[] + R3）绝对路径重验版本，非早期空转版本；2026-08-16 七份（sentinel/navbar/notification/modsearch/memory-evolve/hub-panel/dsh-id）为当日独立复验。
 
 ### 工具与脚本
 

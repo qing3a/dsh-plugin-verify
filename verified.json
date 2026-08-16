@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-16T14:47:11.668Z",
+  "generatedAt": "2026-08-16T14:58:10.616Z",
   "description": "DSH 插件运行时验证开放数据层（dsh-plugin-verify 判定站产出）",
   "verifiedBy": "dsh-plugin-verify@0.1.2",
   "reportBaseUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/",
@@ -112,6 +112,36 @@
       "waterfall": "7/7",
       "toolsResult": true,
       "security": null
+    },
+    {
+      "name": "dsh-id",
+      "fullName": "jiangxingfan1-coder/dsh-id",
+      "repo": "https://github.com/jiangxingfan1-coder/dsh-id",
+      "verifiedBy": "dsh-plugin-verify@0.1.2",
+      "verifiedAt": "2026-08-16",
+      "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/dsh-id-2026-08-16.json",
+      "schemaVersion": 1,
+      "waterfall": "7/7",
+      "toolsResult": true,
+      "security": {
+        "status": "clean",
+        "warnings": []
+      }
+    },
+    {
+      "name": "dsh-hub-panel",
+      "fullName": "jiangxingfan1-coder/dsh-hub-panel",
+      "repo": "https://github.com/jiangxingfan1-coder/dsh-hub-panel",
+      "verifiedBy": "dsh-plugin-verify@0.1.2",
+      "verifiedAt": "2026-08-16",
+      "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/hub-panel-2026-08-16.json",
+      "schemaVersion": 1,
+      "waterfall": "7/7",
+      "toolsResult": true,
+      "security": {
+        "status": "clean",
+        "warnings": []
+      }
     },
     {
       "name": "dsh-memory-evolve",
