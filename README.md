@@ -4,7 +4,7 @@
 
 ![verified](https://img.shields.io/badge/Verified%20插件-14-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![reports](https://img.shields.io/badge/可复现报告-14-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
 
-- **找可信插件**：按功能分类浏览，每个插件带 Verified 徽标 + 验证日期 + 可复现报告——证据可复现的运行时验证（7/7 waterfall + tools/result）
+- **找可信插件**：按场景浏览，每个插件带 Verified 徽标 + 验证日期 + 可复现报告——证据可复现的运行时验证（7/7 waterfall + tools/result）
 - **装得放心**：徽标 = 通过了完整 agent 循环审查；附带安装指引与安全提示
 - **给插件做判定**：插件作者一条命令跑验证拿徽标；顺带帮你发现真实 bug
 
@@ -16,8 +16,8 @@
 
 | 你的目标 | 跳转入口 |
 |---|---|
-| 找一个可信插件 | [Verified 目录](#verified-目录) |
-| 不知道装什么、想按场景选型 | [推荐清单（生态选型参考）](#推荐清单生态选型参考) |
+| 找一个可信插件 | [场景目录](#-场景目录) |
+| 不知道装什么、想按场景选型 | [场景目录](#-场景目录) |
 | 投稿你的插件（2 分钟上架） | [插件作者：投稿](#插件作者投稿你的插件2-分钟上架) |
 | 看懂徽标/状态 | [状态体系](#状态体系) |
 | 安全安装插件 | [使用者：如何安全安装](#使用者如何安全安装) |
@@ -59,54 +59,66 @@
 
 ---
 
-## 🗂 Verified 目录
+## 🧭 场景目录
 
 > 更新于 2026-08-16 · 判定方法：[dsh-plugin-verify CLI](#插件作者投稿你的插件2-分钟上架)
+>
+> 判定站已验证插件与社区推荐候选的**统一选型目录**。每行「状态」三态：**✅ 已验证**（通过 7/7 waterfall + tools/result 运行时复验，报告可复现）· **ⓘ 环境边界**（headless 判定环境缺其依赖服务，属判定方法边界而非插件缺陷，需 web profile 复验）· **候选**（尚未经判定站验证，标注 ⭐ 的为核查时点实测 Star 数，会随生态漂移）。完整状态语义见[状态体系](#-状态体系)。
 
-### 🛠 调试与观测（Debug & Observability）
+**选型原则**：先装"管理基建"，再按你最痛的一两个场景补，别一次装很多。
 
-*事件审计、会话诊断、运行观测——让插件作者/开发者看清 harness 内部发生了什么*
+### 🏗 管理基建（Infrastructure）
+
+*插件市场、管理入口、备份——插件多了之后的底座*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [dsh-market](https://github.com/dsh-market/dsh-market) | 候选 | 官方社区推荐的插件市场：设置页内浏览/搜索/分类筛选/一键安装，已装插件一目了然 | — | — |
+| [plugin-registry](https://github.com/vlln/plugin-registry) | 候选 | 可视化插件管理入口 + `make-dsh-plugin` 开发引导，新手首选 | — | — |
+| [dsh-backup](https://github.com/xiaoyuyu6420/dsh-backup) | 候选 | 一键备份/恢复 DSH 用户数据，定时自动备份，装插件多了之后是救命稻草 | — | — |
+
+### 🔧 调试与排障（Debug & Troubleshooting）
+
+*事件审计、会话诊断——让插件作者/开发者看清 harness 内部发生了什么*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
 | [dsh-event-auditor](https://github.com/qing3a/dsh-event-auditor) | ✅ | harness 事件流审计面板：事件类型/分发模式/计数；settings 热改 + /audit 命令 + headless dump | 2026-08-14 | [view](reports/event-auditor-2026-08-14.json) |
 
-### 🖥 桌面与系统（Desktop & System）
+### 🖥 界面与体验（UI & Experience）
 
-*系统级集成：托盘驻留、桌面外壳、原生能力桥接*
+*侧栏工作台、对话导航、UI 渲染——日常接触最多的界面层*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
-| [dsh-tray](https://github.com/qing3a/dsh-tray) | ✅ | Windows 系统托盘（trayicon exe 宿主，无 native 编译）：菜单/通知/headless 降级 | 2026-08-14 | [view](reports/tray-2026-08-14.json) |
-| [dsh-notification](https://github.com/omdsh-dev/dsh-notification) | ✅ | 回合完成桌面通知：成功/失败/关键词过滤，长任务不用盯屏 | 2026-08-16 | [view](reports/notification-2026-08-16.json) |
 | [DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar) | ⓘ | 服务化侧栏框架：右侧栏+底部面板双工作台（文件/编辑预览/内嵌浏览器/真实终端/Git/后台任务）；`ctx.betterSidebar` 服务开放给第三方插件注册 tab/viewer；只注册 `settings.section`（未碰 single 槽） | 2026-08-15 复验 | — |
-### 🔒 安全与合规（Security & Compliance）
-
-*密钥扫描、危险模式检测、合规工具*
-
-| 插件 | 状态 | 说明 | 验证日期 | 报告 |
-|---|---|---|---|---|
-| [dsh-security-scan](https://github.com/ben7am1n/dsh-security-scan) | ✅ | Secret & dangerous-pattern scanner（zero deps） | 2026-08-14 | [view](reports/security-scan-2026-08-14.json) |
-
-### 📊 效率与监控（Productivity & Monitoring）
-
-*Token 消耗、账户余额、运行指标——成本与资源可见性*
-
-| 插件 | 状态 | 说明 | 验证日期 | 报告 |
-|---|---|---|---|---|
-| [dsh-balance](https://github.com/TwotwoPiggy/dsh-balance) | ✅ | Web 聊天框实时 Token 消耗估算 + DeepSeek 账户余额（纯 JS，ctx.inject 动态注入） | 2026-08-14 | [view](reports/balance-2026-08-14.json) |
+| [dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui) | ⓘ | 任务看板、Git 关系图、皮肤中心、桌面宠物、token 统计一站式合集（生态最高星 ⭐2.4k）；重度 web 前端包 | 2026-08-16 | — |
 | [dsh-navbar](https://github.com/vlln/dsh-navbar) | ✅ | 对话节点导航条：右侧缘节点串快速跳转任意 user 消息节点（长对话不用滚屏） | 2026-08-16 | [view](reports/navbar-2026-08-16.json) |
-| [dsh-automation](https://github.com/titanwings/dsh-automation) | ⓘ | 定时/自动化任务调度：cron 触发、并发限制、人工审批门、历史回放；`automationDomainSpec` 数据域（依赖 zod/luxon，非 zero-dep） | 2026-08-15 复验 | — |
+| [dsh-at-file](https://github.com/omdsh-dev/dsh-at-file) | ✅ | Codex 风格 @path 引用：对话里 `@路径` 解析为文件上下文（agent/pre-step 瀑布注入），客户端注入 ui-input-trigger/ui-slots | 2026-08-15 | [view](reports/at-file-2026-08-15.json) |
+| [dsh-genui](https://github.com/omdsh-dev/dsh-genui) | ✅ | ```dsh-ui fence 生成 UI：模型用 DSL 声明界面，client 渲染器 + settings.section 注册 | 2026-08-15 | [view](reports/genui-2026-08-15.json) |
 
-### ⚙️ 自动化与无人值守（Automation）
+### 🔔 通知与盯守（Notification & Watch）
+
+*回合完成通知、任务进度、系统托盘——长任务不用盯屏*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [dsh-notification](https://github.com/omdsh-dev/dsh-notification) | ✅ | 回合完成桌面通知：成功/失败/关键词过滤，长任务不用盯屏 | 2026-08-16 | [view](reports/notification-2026-08-16.json) |
+| [dsh-task-status](https://github.com/vlln/dsh-task-status) | ⓘ | 后台任务进度 + 实时输出 tail 显示在对话页，构建/下载/测试时不用干瞪眼；必选注入 `webServer`，headless 未激活 | 2026-08-16 | — |
+| [dsh-tray](https://github.com/qing3a/dsh-tray) | ✅ | Windows 系统托盘（trayicon exe 宿主，无 native 编译）：菜单/通知/headless 降级 | 2026-08-14 | [view](reports/tray-2026-08-14.json) |
+
+### ⚙️ 自动化（Automation）
 
 *事件驱动唤醒、定时循环、断线续跑——把人工盯守交给机器*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
 | [dsh-sentinel](https://github.com/fuhefei/dsh-sentinel) | ✅ | 事件驱动唤醒：文件/命令/HTTP/进程/Webhook 触发（v0.10.0，按判定站建议修复 webServer 必选注入 + heartbeat unref；修复后作者即用 dsh-plugin-verify 复测通过，判定站独立复验一致） | 2026-08-16 | [view](reports/sentinel-2026-08-16.json) |
+| [dsh-automation](https://github.com/titanwings/dsh-automation) | ⓘ | 定时/自动化任务调度：cron 触发、并发限制、人工审批门、历史回放；`automationDomainSpec` 数据域（依赖 zod/luxon，非 zero-dep） | 2026-08-15 复验 | — |
+| [dsh-loop](https://github.com/vlln/dsh-loop) | 候选 | `/loop` 定时循环 | — | — |
+| [dsh-auto-continue](https://github.com/HsiangNianian/dsh-auto-continue) | 候选 | 网络波动/超时导致回合失败后自动发"继续"续跑，无人值守必备 | — | — |
 
-### 💻 编码开发（Coding & Development）
+### 💻 编码与仓库（Coding & Repo）
 
 *代码操作、git 集成、终端、文档生成、工具适配器*
 
@@ -114,93 +126,64 @@
 |---|---|---|---|---|
 | [dsh-repo-context](https://github.com/qing3a/dsh-repo-context) | ✅ | 把 git 状态与仓库规范动态注入 system prompt（section/context/variable，官方缝隙插件） | 2026-08-14 | [view](reports/repo-context-2026-08-14.json) |
 | [falsify-dsh](https://github.com/shi275773124/falsify-dsh) | ✅ | Falsify CLI 适配器：裁决收据（lint / review --json / gate） | 2026-08-14 | [view](reports/falsify-2026-08-14.json) |
-| [dsh-at-file](https://github.com/omdsh-dev/dsh-at-file) | ✅ | Codex 风格 @path 引用：对话里 `@路径` 解析为文件上下文（agent/pre-step 瀑布注入），客户端注入 ui-input-trigger/ui-slots | 2026-08-15 | [view](reports/at-file-2026-08-15.json) |
-| [dsh-genui](https://github.com/omdsh-dev/dsh-genui) | ✅ | ```dsh-ui fence 生成 UI：模型用 DSL 声明界面，client 渲染器 + settings.section 注册 | 2026-08-15 | [view](reports/genui-2026-08-15.json) |
 
-### 🧠 模型能力增强（Model Capabilities）
+### 🔒 安全与合规（Security & Compliance）
 
-*补足基础模型缺失的模态/能力：视觉、多模态理解*
+*密钥扫描、危险模式检测、合规工具——装第三方插件前建议先有*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [dsh-security-scan](https://github.com/ben7am1n/dsh-security-scan) | ✅ | Secret & dangerous-pattern scanner（zero deps） | 2026-08-14 | [view](reports/security-scan-2026-08-14.json) |
+| [dsh-plugin-vetting](https://github.com/truelove-dreamer/dsh-plugin-vetting) | 候选 | 装插件前静态扫描恶意模式（外传/凭据/混淆），覆盖供应链检查 | — | — |
+| [dsh-mcpguard](https://github.com/ChenLaoshiYF/dsh-mcpguard) | 候选 | 扫描 skill 与 MCP 配置中的提示注入、同形字、危险 shell | — | — |
+| [dsh-permission-rules](https://github.com/PerryLink/dsh-permission-rules) | 候选 | Claude Code 风格声明式权限规则（allow/deny/ask） | — | — |
+
+### 📊 效率（Productivity）
+
+*Token 消耗、账户余额——成本与资源可见性*
+
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [dsh-balance](https://github.com/TwotwoPiggy/dsh-balance) | ✅ | Web 聊天框实时 Token 消耗估算 + DeepSeek 账户余额（纯 JS，ctx.inject 动态注入） | 2026-08-14 | [view](reports/balance-2026-08-14.json) |
+
+### 🧠 模型能力（Model Capabilities）
+
+*视觉、搜索——补足纯文本模型缺失的模态*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
 | [ModLens](https://github.com/liustack/modlens) | ✅ | 首个 DSH 视觉插件：聊天直接粘贴图片 → 文本模型获得视觉（image→文本引擎），注入 tools/agents/attachments/llm（入口走 package.json `exports` 而非 `main`，实测加载正常） | 2026-08-15 | [view](reports/modlens-2026-08-15.json) |
 | [modsearch](https://github.com/liustack/modsearch) | ✅ | 搜索网页和 X，返回带引用的结构化证据；注入 tools/web（与 ModLens 组成"看+搜"组合） | 2026-08-16 | [view](reports/modsearch-2026-08-16.json) |
+| [dsh-vision-toolkit](https://github.com/Anionex/dsh-vision-toolkit) | 候选（⭐405） | 图片问答、长截图 OCR、UI 还原、像素对比，适合前端/视觉任务 | — | — |
+| [anweat/dsh-web-search-pro](https://github.com/anweat/dsh-web-search-pro) | 候选 | 多引擎+缓存的搜索后端增强 | — | — |
+| [TonyDua/dsh-web-search-exa](https://github.com/TonyDua/dsh-web-search-exa) | 候选 | 零配置 Exa 搜索后端 | — | — |
 
-### 🧠 跨会话记忆（Cross-session Memory）
+### 💾 记忆（Memory）
 
 *长期记忆、会话持久化、记忆主权——跨会话经验累积*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
 | [dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve) | ✅ | 纯插件五轨长期记忆 + 技能自进化，零核心修改、卸载即净（注入 tools/systemPrompt/agents/settings 等 8 服务，headless 全激活） | 2026-08-16 | [view](reports/memory-evolve-2026-08-16.json) |
+| [dsh-mneme](https://github.com/modusensus/dsh-mneme) | 候选 | SQLite + 可人工编辑的 Markdown 镜像，记忆透明可改（"记忆主权"派） | — | — |
 
-> **2026-08-16 第二批次**（推荐清单缺口，4 个候选）：**dsh-memory-evolve ✅ + modsearch ✅**（均 7/7 waterfall 通过，报告已附，推荐清单同步升级）；**dsh-task-status ⓘ + dsh-web-ui ⓘ**（依赖 web 环境服务，headless 无法激活——task-status 必选注入 `webServer`，web-ui 为重度 web 前端包，均属判定方法边界，非插件缺陷）。
+### 🎮 乐子（Fun）
 
-> **2026-08-16 收录批次**（3 个，全部 ✅）：dsh-sentinel（v0.10.0）· dsh-navbar（v0.3.0）· dsh-notification（v0.1.1）——均为运行时验证 7/7 waterfall + tools/result 通过（报告已附）。sentinel 的修复正是判定站 #4 建议的产物（webServer 移出必选 inject + heartbeat unref），作者先自测通过、判定站独立复验一致，形成"验证 → 作者采纳 → 生态受益"完整闭环；navbar/notification 为推荐清单候选，验证通过后升级为已验证推荐。
+*桌面宠物、摸鱼游戏、音乐——按需*
 
-> **2026-08-15 收录批次**（5 个）：dsh-at-file · dsh-genui · dsh-automation · DSH-better-sidebar · ModLens——静态校验（R1 入口形态 + R2 patch YAML）全部通过，运行时验证（7/7 waterfall + tools/result）：**3 通过升级 ✅**（at-file / genui / modlens，报告已附），**2 标 ⓘ 环境边界**。复验结论（2026-08-15）：better-sidebar 本地 `pnpm build` 成功、产物入口形态正确，但 inject `webServer`/`webRuntime`；automation inject `storageDomain` 等 4 服务 + `connection`（浏览器 RPC 通道）——两者均依赖 web 环境服务，**headless 判定模式无法激活，需浏览器级验证通道（判定站方法论升级项）**，非插件行为缺陷。静态注意项实测结论：genui 缺 `name` 导出（loader 用 entry id 兜底）与 modlens 走 `exports` 入口均**加载正常**，判定站 R1 的检测盲区已用运行时验证补上。
+| 插件 | 状态 | 说明 | 验证日期 | 报告 |
+|---|---|---|---|---|
+| [whale-girl](https://github.com/vlln/whale-girl) | 候选 | 桌面宠物 | — | — |
+| [dsh-minigames](https://github.com/lhh010/dsh-minigames) | 候选 | 18 款摸鱼小游戏 | — | — |
+| [dsh-MusicPlayer](https://github.com/xiekai886/dsh-MusicPlayer) | 候选 | 网易云音乐播放器 | — | — |
+
+> **选型建议**：不用一次装很多。从 **[dsh-market](https://github.com/dsh-market/dsh-market) + [dsh-backup](https://github.com/xiaoyuyu6420/dsh-backup)** 起步，再加你当前最痛的一两个场景（纯文本模型就上 modlens+modsearch；总盯着长任务就上 dsh-task-status+dsh-notification），用几天再扩。
+
+> ⚠️ **注意**：候选 = 未经判定站验证。这些全是第三方插件，会在你机器上运行代码。装之前看一眼仓库的源码、许可证和最近更新情况，优先装 Star 高、活跃维护的。安装方式一般是 `dsh plugin add <GitHub 仓库>` 或在市场里一键安装。**推荐 ≠ 判定站 Verified**——想让场景目录里哪个插件拿到 ✅ 徽标，走[投稿流程](#插件作者投稿你的插件2-分钟上架)，判定站免费帮你跑一遍运行时验证。
+
+> **收录批次**：2026-08-16 第二批次（4 个候选）：dsh-memory-evolve ✅ + modsearch ✅（均 7/7 waterfall 通过，报告已附）；dsh-task-status ⓘ + dsh-web-ui ⓘ（依赖 web 环境服务，headless 无法激活——task-status 必选注入 `webServer`，web-ui 为重度 web 前端包，均属判定方法边界，非插件缺陷）。2026-08-16 收录批次（3 个，全部 ✅）：dsh-sentinel（v0.10.0）· dsh-navbar（v0.3.0）· dsh-notification（v0.1.1）——sentinel 的修复正是判定站 #4 建议的产物（webServer 移出必选 inject + heartbeat unref），形成"验证 → 作者采纳 → 生态受益"完整闭环。2026-08-15 收录批次（5 个）：at-file/genui/modlens 通过升级 ✅，automation/better-sidebar 标 ⓘ（依赖 web 环境服务，headless 判定模式无法激活，需浏览器级验证通道，非插件缺陷）。
 
 > 你的插件还没在？[拿徽标只要 2 分钟](#插件作者投稿你的插件2-分钟上架)。
-
----
-
-## 🧭 推荐清单（生态选型参考）
-
-> 不知道装什么？这是从 **GitHub `dsh-plugin` topic（1700+ 仓库）与社区 awesome 清单**（[awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) · [bruc3van/awesome-dsh-plugin](https://github.com/bruc3van/awesome-dsh-plugin) · [0xsline/awesome-deepseek-harness](https://github.com/0xsline/awesome-deepseek-harness)）检索整理的分层选型参考（2026-08-15）。**它不是判定站验证结论**：清单里大多插件未经 7/7 waterfall 运行时验证，只有标注 ✅/ⓘ 的才是判定站已收录项（[Verified 目录](#verified-目录)）。链接已逐一核查真实存在（2026-08-15），⭐ 为核查时点实测值，会随生态增长漂移。
-
-**选型原则**：先装"管理基建"，再按你最痛的一两个场景补，别一次装很多。
-
-### 🥇 第一优先：先装"管理基建"
-
-| 插件 | 为什么装 |
-|---|---|
-| [dsh-market](https://github.com/dsh-market/dsh-market) | 官方社区推荐的插件市场：设置页内浏览/搜索/分类筛选/一键安装，已装插件一目了然 |
-| [plugin-registry](https://github.com/vlln/plugin-registry) | 可视化插件管理入口 + `make-dsh-plugin` 开发引导，新手首选 |
-| [dsh-backup](https://github.com/xiaoyuyu6420/dsh-backup) | 一键备份/恢复 DSH 用户数据，定时自动备份，装插件多了之后是救命稻草 |
-
-### 🥈 日常体验（几乎人人都受益）
-
-- **[DSH-better-sidebar](https://github.com/omdsh-dev/DSH-better-sidebar)**（⭐1k）— 把侧边栏升级成工作台：内置文件渲染编辑、终端、Git 与子代理。目前最受欢迎的增强。
-- **[dsh-task-status](https://github.com/vlln/dsh-task-status)** ⓘ — 后台任务进度 + 实时输出 tail 显示在对话页，构建/下载/测试时不用干瞪眼。*判定站 ⓘ：必选注入 `webServer`，headless 未激活，需 web profile 复验*
-- **[dsh-notification](https://github.com/omdsh-dev/dsh-notification)** ✅ — 回合完成发桌面通知，可按成功/失败/关键词过滤，长任务不用盯屏。*判定站 ✅：v0.1.1 复验 7/7 waterfall（2026-08-16）*
-- **[dsh-navbar](https://github.com/vlln/dsh-navbar)** ✅ — 长对话快速跳转任意用户消息节点。*判定站 ✅：v0.3.0 复验 7/7 waterfall（2026-08-16）*
-- **[dsh-at-file](https://github.com/omdsh-dev/dsh-at-file)** — 输入框里按 `@` 搜索工作区文件并附进 prompt，免去手动复制粘贴。
-- **[dsh-genui](https://github.com/omdsh-dev/dsh-genui)** — 在回复中直接渲染图表、表单、Mermaid、3D 场景，且用户操作能回送模型。
-- 想要"一次装齐"的可以看 **[dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui)** ⓘ（⭐2.4k，生态最高星）：任务看板、Git 关系图、皮肤中心、桌面宠物、token 统计一站式合集。*判定站 ⓘ：重度 web 前端包，headless 未激活*
-
-### 🥉 让模型"看得见、搜得到"（纯文本模型的刚需）
-
-- **[ModLens](https://github.com/liustack/modlens)** ✅（⭐1.7k）— 粘贴图片即得 OCR/布局/语义结构化证据，让纯文本模型可靠看图
-- **[modsearch](https://github.com/liustack/modsearch)** ✅ — 搜索网页和 X，返回带引用的结构化证据，与 modlens 组成"看+搜"组合。*判定站 ✅：v5.4.2 复验 7/7 waterfall（2026-08-16）*
-- **[dsh-vision-toolkit](https://github.com/Anionex/dsh-vision-toolkit)**（⭐405）— 图片问答、长截图 OCR、UI 还原、像素对比，适合前端/视觉任务
-- 搜索后端增强：[anweat/dsh-web-search-pro](https://github.com/anweat/dsh-web-search-pro)（多引擎+缓存）、[TonyDua/dsh-web-search-exa](https://github.com/TonyDua/dsh-web-search-exa)（零配置 Exa）
-
-### ⚙️ 自动化与无人值守
-
-- **[dsh-sentinel](https://github.com/fuhefei/dsh-sentinel)** ✅ — 文件/命令/HTTP/进程/Webhook 事件驱动唤醒，让循环从"定时"升级为"事件触发"。*判定站 ✅：v0.10.0 独立复验 7/7 waterfall（2026-08-16），修复正是判定站 #4 建议的产物*
-- **[dsh-loop](https://github.com/vlln/dsh-loop)** — `/loop` 定时循环
-- **[dsh-auto-continue](https://github.com/HsiangNianian/dsh-auto-continue)** — 网络波动/超时导致回合失败后自动发"继续"续跑，无人值守必备
-
-### 🧠 跨会话记忆
-
-- **[dsh-memory-evolve](https://github.com/csyangwen/dsh-memory-evolve)** ✅ — 纯插件五轨长期记忆 + 技能自进化，零核心修改、卸载即净。*判定站 ✅：v0.1.0 复验 7/7 waterfall（2026-08-16）*
-- **[dsh-mneme](https://github.com/modusensus/dsh-mneme)** — SQLite + 可人工编辑的 Markdown 镜像，记忆透明可改（"记忆主权"派）
-
-### 🔒 安全相关（装第三方插件前建议先有）
-
-- **[dsh-plugin-vetting](https://github.com/truelove-dreamer/dsh-plugin-vetting)** — 装插件前静态扫描恶意模式（外传/凭据/混淆），覆盖供应链检查
-- **[dsh-mcpguard](https://github.com/ChenLaoshiYF/dsh-mcpguard)** — 扫描 skill 与 MCP 配置中的提示注入、同形字、危险 shell
-- **[dsh-permission-rules](https://github.com/PerryLink/dsh-permission-rules)** — Claude Code 风格声明式权限规则（allow/deny/ask）
-
-### 🎮 可选的乐子（按需）
-
-- [whale-girl](https://github.com/vlln/whale-girl) 桌面宠物
-- [dsh-minigames](https://github.com/lhh010/dsh-minigames) 18 款摸鱼小游戏
-- [dsh-MusicPlayer](https://github.com/xiekai886/dsh-MusicPlayer) 网易云音乐播放器
-
-**我的建议**：不用一次装很多。从 **[dsh-market](https://github.com/dsh-market/dsh-market) + [dsh-backup](https://github.com/xiaoyuyu6420/dsh-backup)** 起步，再加你当前最痛的一两个场景（比如纯文本模型就上 modlens+modsearch；总盯着长任务就上 dsh-task-status+dsh-notification），用几天再扩。
-
-> ⚠️ **注意**：这些全是第三方插件，会在你机器上运行代码。装之前看一眼仓库的源码、许可证和最近更新情况，优先装 Star 高、活跃维护的。安装方式一般是 `dsh plugin add <GitHub 仓库>` 或在市场里一键安装。**推荐 ≠ 判定站 Verified**——想让清单里哪个插件拿到 ✅ 徽标，走[投稿流程](#插件作者投稿你的插件2-分钟上架)，判定站免费帮你跑一遍运行时验证。
 
 ---
 
@@ -350,7 +333,7 @@ npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
 
 ## 🛡 使用者：如何安全安装
 
-1. 从[目录](#verified-目录)选 ✅ Verified 插件
+1. 从[场景目录](#-场景目录)选 ✅ Verified 插件
 2. 查看验证日期（久于一周需谨慎——DSH 每天更新）与[报告](#资源中心)
 3. `dsh plugin --profile web add <插件包名>`（以插件自身 README 为准）
 4. 先在隔离 profile 试加载，不提供生产密钥
