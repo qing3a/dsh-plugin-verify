@@ -239,19 +239,19 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 → tools/pre-execute → tools/execute → tools/post-execute → tools/result
 ```
 
-**通过标准**：7/7 waterfall 链完整 + `tools/result` 收尾（零副作用）+ **R3**（目标工具真实执行成功——`tools/result` 载荷 `isError:false`；目标工具本身 `UNKNOWN_TOOL` 判失败，postmortem 0002 教训）。
+**通过标准**：7/7 waterfall 链完整 + `tools/result` 收尾（零副作用）+ **R3**（目标工具真实执行成功——`tools/result` 载荷 `isError:false`；目标工具本身 `UNKNOWN_TOOL` 判失败，postmortem 0002 教训）。**R4**（功能冒烟，附加证据）——mock 触发的工具参数真实到达执行层，证明"能装且能用"而非仅"能加载"；R4 不并入总 pass（兼容工具未触发的合法场景），通过时报告标注。
 
 **报告怎么读**（`verify-report.json`）：
 
 ```json
 { "pass": true, "waterfallFound": [7/7 事件], "waterfallMissing": [],
-  "rules": [{"name":"R1-entry-shape","pass":true,...},{"name":"R2-patch-yaml","pass":true,...},{"name":"R3-tools-result","pass":true,...}],
+  "rules": [{"name":"R1-entry-shape","pass":true,...},{"name":"R2-patch-yaml","pass":true,...},{"name":"R3-tools-result","pass":true,...},{"name":"R4-function-smoke","pass":true,...}],
   "detail": "捕获事件: 13 | tools/result: 是" }
 ```
 
 - `pass: true` + `missing: []` + `rules[]` 全 `pass` = ✅ 通过
 - `missing` 列出哪段链没出现 → 定位插件哪个 waterfall 监听器有问题
-- `rules[]`：R1（入口形态，postmortem 0001 unwrapExports 陷阱）、R2（`!!js` 只在 config 子树，postmortem 0002）、R3（`UNKNOWN_TOOL` 运行时判失败，postmortem 0002 快照教训）——静态规则是确定性信号，最终以运行时判定为准
+- `rules[]`：R1（入口形态，postmortem 0001 unwrapExports 陷阱）、R2（`!!js` 只在 config 子树，postmortem 0002）、R3（`UNKNOWN_TOOL` 运行时判失败，postmortem 0002 快照教训）、R4（工具参数到达断言，功能冒烟）——静态规则是确定性信号，最终以运行时判定为准
 - 每份报告含插件路径、DSH checkout、日期 → 可复现
 - 人工评审层：`docs/review-checklist.md`（官方 defensive-patterns 7 条 + postmortem 检查点）
 
