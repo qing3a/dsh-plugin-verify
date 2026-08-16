@@ -284,19 +284,24 @@ interface AnalyzeResult {
  * @param targetToolName mock 触发/期望执行的目标工具名（win=pwsh 否则 bash，
  *   与 startMockLlm 一致）——R3 用它区分"平台预期失败"与"插件破坏工具注册"：
  *   目标工具本身 UNKNOWN_TOOL = 工具链被破坏（postmortem 0002 场景）→ 判失败；
- *   其他 isError（INVALID_ARGS/sandbox denied 等）→ 记录不判失败（参数/平台/策略相关）。 */
-export function analyze(dumpPath: string, targetToolName?: string): AnalyzeResult {
+ *   其他 isError（INVALID_ARGS/sandbox denied 等）→ 记录不判失败（参数/平台/策略相关）。
+ * @param expectedArg mock 触发的工具参数片段（如 'echo ok'）——R4 功能冒烟：
+ *   断言参数真实到达工具层（tools/execute 载荷），证明"能装且能用"而不只是"能加载"。 */
+export function analyze(dumpPath: string, targetToolName?: string, expectedArg = 'echo ok'): AnalyzeResult {
   if (!existsSync(dumpPath)) {
     return {
       pass: false,
       found: [],
       missing: WATERFALL_CHAIN.map(([n]) => n),
       detail: 'dump 文件不存在',
-      rules: [{ name: 'R3-tools-result', pass: false, detail: '无 dump 可检查' }],
+      rules: [
+        { name: 'R3-tools-result', pass: false, detail: '无 dump 可检查' },
+        { name: 'R4-function-smoke', pass: false, detail: '无 dump 可检查' },
+      ],
     }
   }
   const raw = JSON.parse(readFileSync(dumpPath, 'utf8')) as {
-    records: Array<{ event: string; payload?: { isError: boolean; code?: string; message?: string } }>
+    records: Array<{ event: string; payload?: { isError?: boolean; code?: string; message?: string; execName?: string; execArgs?: string } }>
   }
   const foundSet = new Set(raw.records.map((r) => r.event))
   const missing = WATERFALL_CHAIN.map(([n]) => n).filter((n) => !foundSet.has(n))
@@ -319,8 +324,23 @@ export function analyze(dumpPath: string, targetToolName?: string): AnalyzeResul
       ? `工具已触发（目标 ${targetToolName ?? '未知'}）：${firstErr.payload?.code}（${firstErr.payload?.message}）——平台/参数/策略相关，不判失败`
       : `工具真实执行成功（${toolResults.length} 次结果，无 isError）`
 
+  // R4：功能冒烟——mock 触发的工具参数是否真实到达工具层（tools/execute 载荷）。
+  // 这是"能装且能用"的证据：waterfall 链完整只证明插件没破坏宿主，R4 证明
+  // 工具调用的参数真实生效（echo ok 到达 pwsh/bash 的执行层）。
+  const execs = raw.records.filter((r) => r.event === 'tools/execute')
+  const matchedExec = execs.find((r) => r.payload?.execName !== undefined)
+  const argsReached = matchedExec?.payload?.execArgs !== undefined
+    && matchedExec.payload.execArgs.includes(expectedArg)
+  const r4Detail = !matchedExec
+    ? `无 tools/execute 载荷（工具未触发或审计器旧版）——功能冒烟未覆盖`
+    : argsReached
+      ? `功能冒烟通过：工具 ${matchedExec.payload?.execName} 收到参数（含 "${expectedArg}"），参数真实到达执行层`
+      : `功能冒烟未过：工具 ${matchedExec.payload?.execName} 已触发但参数未含 "${expectedArg}"（实际: ${matchedExec.payload?.execArgs ?? '无'}）`
+
   const rules: RuntimeRuleResult[] = [
     { name: 'R3-tools-result', pass: !targetBlocked, detail: r3Detail },
+    // R4 是附加证据（不并入总 pass）：兼容旧报告与工具未触发的合法场景
+    { name: 'R4-function-smoke', pass: argsReached, detail: r4Detail },
   ]
   return { pass: missing.length === 0 && hasResult && !targetBlocked, found, missing, detail, rules }
 }

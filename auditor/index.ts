@@ -38,8 +38,9 @@ interface AuditRecord {
   mode: string
   at: number
   seq: number
-  /** tools/result 载荷摘要（仅 isError/code/message，防大对象撑爆 dump） */
-  payload?: { isError: boolean; code?: string; message?: string }
+  /** tools/result 载荷摘要（仅 isError/code/message，防大对象撑爆 dump）；
+   *  tools/execute 载荷摘要（execName + execArgs 截断，功能冒烟断言用） */
+  payload?: { isError?: boolean; code?: string; message?: string; execName?: string; execArgs?: string }
 }
 
 function watch(ctx: Context, event: string, handler: (...args: unknown[]) => void): () => void {
@@ -72,8 +73,27 @@ export function apply(ctx: Context): void {
   let seq = 0
 
   for (const [eventName, mode] of WATERFALL_CHAIN) {
-    const dispose = watchWaterfall(ctx, eventName, () => {
-      records.push({ event: eventName, mode, at: Date.now(), seq: seq++ })
+    const dispose = watchWaterfall(ctx, eventName, (...args: unknown[]) => {
+      const rec: AuditRecord = { event: eventName, mode, at: Date.now(), seq: seq++ }
+      // 功能冒烟：tools/execute 捕获 exec 的参数摘要（arguments 截断防大对象）
+      if (eventName === 'tools/execute') {
+        const exec = (args[0] ?? {}) as { name?: string; arguments?: unknown }
+        if (typeof exec.name === 'string') {
+          rec.payload = { execName: exec.name }
+        }
+        if (exec.arguments !== undefined) {
+          try {
+            const s = JSON.stringify(exec.arguments)
+            rec.payload = {
+              ...(rec.payload ?? {}),
+              execArgs: s.length > 300 ? s.slice(0, 300) : s,
+            }
+          } catch {
+            // 不可序列化的 arguments（罕见）跳过，不影响 waterfall 判定
+          }
+        }
+      }
+      records.push(rec)
     })
     ctx.effect(() => dispose, `verify-auditor: watch ${eventName}`)
   }
