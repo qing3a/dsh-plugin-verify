@@ -41,5 +41,18 @@
       "detail": "工具真实执行成功（1 次结果，无 isError）"
     }
   ],
-  "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是"
+  "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是",
+  "fullName": "fuhefei/dsh-sentinel",
+  "verifiedBy": "dsh-plugin-verify@0.1.2",
+  "schemaVersion": 1,
+  "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/sentinel-2026-08-16.json",
+  "security": {
+    "status": "warnings",
+    "warnings": [
+      {
+        "rule": "P401-single-slot",
+        "detail": "⚠️ [SHOULD P-401] 1 处注册 single 槽——第三方 priority 恒低，注册即 shadow 官方 UI 并破坏其子槽声明（如 sidebar.workspaces.directoryFlow 链路）: src\\client\\index.tsx 注册 sidebar.workspaces.s"
+      }
+    ]
+  }
 }
