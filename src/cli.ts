@@ -35,6 +35,7 @@ interface CliArgs {
   repoPath: string
   outDir: string
   dumpPath: string
+  fullName: string
   verbose: boolean
 }
 
@@ -43,6 +44,7 @@ function parseArgs(argv: readonly string[]): CliArgs {
   let pluginPath = ''
   let repoPath = process.env.DSH_REPO ?? ''
   let outDir = process.cwd()
+  let fullName = ''
   let verbose = false
 
   for (let i = 0; i < args.length; i++) {
@@ -51,6 +53,8 @@ function parseArgs(argv: readonly string[]): CliArgs {
       repoPath = args[++i] ?? ''
     } else if (a === '--out') {
       outDir = args[++i] ?? ''
+    } else if (a === '--full-name') {
+      fullName = args[++i] ?? ''
     } else if (a === '--verbose') {
       verbose = true
     } else if (!a.startsWith('-')) {
@@ -59,14 +63,46 @@ function parseArgs(argv: readonly string[]): CliArgs {
   }
 
   if (!pluginPath) {
-    throw new Error('用法: dsh-plugin-verify <插件路径或git URL> [--repo <DSH checkout路径>] [--out <报告目录>]')
+    throw new Error('用法: dsh-plugin-verify <插件路径或git URL> [--repo <DSH checkout路径>] [--out <报告目录>] [--full-name <owner/name>]')
   }
   if (!repoPath) {
     throw new Error('未指定 DSH checkout：用 --repo 或 DSH_REPO 环境变量')
   }
   // ⚠️ dumpPath 必须绝对路径：auditor 在 headless 子进程里写文件，相对路径会随
   // 子进程 cwd（profile 目录/checkout）漂移导致 dump 写丢（2026-08-14 实测踩到）
-  return { pluginPath, repoPath, outDir, dumpPath: resolve(outDir, 'verify-dump.json'), verbose }
+  return { pluginPath, repoPath, outDir, dumpPath: resolve(outDir, 'verify-dump.json'), fullName, verbose }
+}
+
+/** 推导插件仓库标识 owner/name（报告 fullName 字段，市场索引的规范映射键）。
+ * 优先 --full-name 显式值；其次从 git URL（github:o/r 或 https://github.com/o/r）解析；
+ * 本地路径无法推断 → null（发布层按 REPO_MAP 回填）。 */
+function deriveFullName(pluginPath: string, flagValue: string): string | null {
+  if (flagValue) {
+    return flagValue.replace(/^github:/, '').replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '')
+  }
+  const m = /github:([^/]+\/[^/]+)/.exec(pluginPath) ?? /https?:\/\/github\.com\/([^/]+\/[^/]+)/.exec(pluginPath)
+  return m ? m[1].replace(/\.git$/, '') : null
+}
+
+/** 自身版本（verifiedBy 带版本号，市场可追溯校验器版本） */
+function selfVersion(): string {
+  try {
+    const pkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8'))
+    return `dsh-plugin-verify@${pkg.version ?? '0'}`
+  } catch {
+    return 'dsh-plugin-verify@0'
+  }
+}
+
+/** security 摘要：从静态规则结果聚合（P202/P401 warn → warnings，否则 clean）。
+ * 报告自包含，数据层无需再推导。 */
+function securitySummary(rules: Array<{ name: string; pass: boolean; detail: string; warn?: boolean }>): { status: string; warnings: Array<{ rule: string; detail: string }> } | null {
+  const secRules = rules.filter((r) => r.name?.startsWith('P202') || r.name?.startsWith('P401'))
+  if (secRules.length === 0) return null
+  const warnings = secRules
+    .filter((r) => r.warn)
+    .map((r) => ({ rule: r.name, detail: (r.detail ?? '').slice(0, 160) }))
+  return { status: warnings.length === 0 ? 'clean' : 'warnings', warnings }
 }
 
 function run(cmd: string, args: string[], opts: { cwd?: string; env?: Record<string, string>; timeoutMs?: number } = {}): { code: number; stdout: string } {
@@ -325,15 +361,20 @@ export async function main(): Promise<number> {
       if (args.verbose) console.log(output)
       console.log('[5/5] 分析事件审计')
       const result = analyze(args.dumpPath, mock.toolName)
+      const allRules = [...staticResult.rules, ...result.rules]
 
       const report = {
         plugin: args.pluginPath,
         repo: args.repoPath,
+        fullName: deriveFullName(args.pluginPath, args.fullName),
         date: new Date().toISOString(),
         pass: result.pass,
+        verifiedBy: selfVersion(),
+        schemaVersion: 1,
         waterfallFound: result.found,
         waterfallMissing: result.missing,
-        rules: [...staticResult.rules, ...result.rules],
+        rules: allRules,
+        security: securitySummary(allRules),
         detail: result.detail,
       }
       const reportFile = join(args.outDir, 'verify-report.json')
