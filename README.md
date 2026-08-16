@@ -296,6 +296,25 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 | [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) | DSH 插件全量分级观测（L0-L4）；我们的运行实测证据可用于其 L4 登记 |
 | [deepseek-harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) | DSH 本体；插件跑在它之上 |
 
+### 开放数据层（verified.json）
+
+判定站验证结果以开放数据层对外提供，任何插件市场/清单可直接引用：
+
+- **[verified.json](verified.json)** — 全部 ✅ Verified 插件的运行时证据聚合（`verifiedBy` / `verifiedAt` / `reportUrl` / `waterfall` / `toolsResult` / `security`）
+- **生成脚本**：[scripts/generate-verified.mjs](scripts/generate-verified.mjs) — 从 reports/ 聚合，验证一次跑一次
+- **引用方式**：市场在 registry 条目加可选 `runtime` 字段（示例见 [YELEBAI 互操作提案](https://github.com/YELEBAI/dsh-plugin-marketplace/issues/5)）
+
+---
+
+## 🛡 生态安全层（Security Dimension）
+
+验证不只测"行为正确"，还跑静态安全规则并随报告公开：
+
+- **P202**（裸 `child_process.spawn`）——不经 `ctx.subprocess` 的子进程逃逸 host-exit 同步回收
+- **P401**（single 槽注册）——第三方 priority 恒低，注册即 shadow 官方 UI 并破坏其子槽声明
+
+结果聚合进 `verified.json` 的 `security` 字段（`clean` / `warnings` / `未评估`）。**自动批准类插件是生态定时炸弹**——判定站的「运行时验证 + 静态安全规则」双重防线，让"可信"从口号变成可复现的证据。
+
 ---
 
 ## 🚀 插件作者：投稿你的插件（2 分钟上架）
