@@ -14,6 +14,10 @@ import { fileURLToPath } from 'node:url'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const reportsDir = join(root, 'reports')
+/** 校验器版本（与 CLI 报告 verifiedBy 对齐，读 package.json 避免硬编码漂移） */
+const VER = JSON.parse(readFileSync(join(root, 'package.json'), 'utf-8')).version ?? '0'
+const VERIFIER = `dsh-plugin-verify@${VER}`
+const REPORT_BASE = 'https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/'
 
 /** 报告文件名(去日期后缀) → GitHub 仓库 URL 映射 */
 const REPO_MAP = {
@@ -54,26 +58,49 @@ const NAME_MAP = {
 const files = readdirSync(reportsDir).filter((f) => f.endsWith('.json') && !f.startsWith('.'))
 const entries = []
 
+/** 回填旧报告：补契约字段（fullName/verifiedBy/schemaVersion/reportUrl/security），幂等（key 已存在不覆盖）。
+ * security 的 null 是合法值（未评估），也要写入——判断只看 key 是否存在，不看值。 */
+function backfill(report, patch) {
+  let changed = false
+  for (const [k, v] of Object.entries(patch)) {
+    if (report[k] === undefined) {
+      report[k] = v
+      changed = true
+    }
+  }
+  return changed
+}
+
 for (const f of files) {
-  const report = JSON.parse(readFileSync(join(reportsDir, f), 'utf-8'))
+  const filePath = join(reportsDir, f)
+  const report = JSON.parse(readFileSync(filePath, 'utf-8'))
   if (!report.pass) continue
 
   // 文件名形如 modsearch-2026-08-16.json → 取 '-' 前前缀匹配映射
   const key = f.replace(/-\d{4}-\d{2}-\d{2}\.json$/, '')
-  const repoUrl = REPO_MAP[key]
+  // 规范映射键优先读报告内 fullName；旧报告从 REPO_MAP 推导（owner/name）
+  const repoUrl = report.fullName ? `https://github.com/${report.fullName}` : REPO_MAP[key]
+  const fullName = report.fullName ?? (repoUrl ? repoUrl.replace('https://github.com/', '') : null)
   const name = NAME_MAP[key] ?? key
   // 验证日期以报告文件名为准（归档时用本地日期命名，比 report.date 的 UTC 更准确）
   const date = f.match(/(\d{4}-\d{2}-\d{2})/)?.[1] ?? (report.date || '').slice(0, 10)
+  const reportUrl = `${REPORT_BASE}${f}`
+
+  // 回填报告契约字段（CLI 新产物自带，旧产物补齐）
+  const security = report.security ?? extractSecurity(report)
+  if (backfill(report, { fullName, verifiedBy: VERIFIER, schemaVersion: 1, reportUrl, security })) {
+    writeFileSync(filePath, JSON.stringify(report, null, 2) + '\n')
+  }
 
   entries.push({
     name,
     repo: repoUrl ?? null,
-    verifiedBy: 'dsh-plugin-verify',
+    verifiedBy: report.verifiedBy ?? 'dsh-plugin-verify',
     verifiedAt: date,
-    reportUrl: `https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/${f}`,
+    reportUrl,
     waterfall: `${report.waterfallFound.length}/7`,
     toolsResult: report.detail?.includes('tools/result: 是') ?? false,
-    security: extractSecurity(report),
+    security,
   })
 }
 
@@ -100,8 +127,8 @@ const out = {
   schemaVersion: 1,
   generatedAt: new Date().toISOString(),
   description: 'DSH 插件运行时验证开放数据层（dsh-plugin-verify 判定站产出）',
-  verifiedBy: 'dsh-plugin-verify',
-  reportBaseUrl: 'https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/',
+  verifiedBy: VERIFIER,
+  reportBaseUrl: REPORT_BASE,
   plugins: entries,
 }
 
