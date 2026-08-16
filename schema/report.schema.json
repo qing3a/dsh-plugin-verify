@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/qing3a/dsh-plugin-verify/main/schema/report.schema.json",
+  "title": "dsh-plugin-verify 验证报告",
+  "description": "DSH 插件运行时验证报告的机器可读规范（v1）。市场/索引/CI 消费本 schema 校验与解析报告；字段语义与生成逻辑见 lib/cli.js 与 scripts/generate-verified.mjs。",
+  "type": "object",
+  "required": ["plugin", "repo", "fullName", "date", "pass", "verifiedBy", "schemaVersion", "reportUrl", "waterfallFound", "waterfallMissing", "rules", "security", "detail"],
+  "additionalProperties": false,
+  "properties": {
+    "plugin": {
+      "type": "string",
+      "description": "被验证插件的本地解包路径（验证环境内有效，非插件仓库标识）"
+    },
+    "repo": {
+      "type": "string",
+      "description": "验证基准 DSH checkout 路径（验证环境内有效，非插件仓库标识）"
+    },
+    "reportUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "本报告的规范 URL（发布层注入，reports/ 目录 blob 链接；CLI 原始产物为中间形态，经 generate-verified 回填后符合本 schema）"
+    },
+    "fullName": {
+      "type": ["string", "null"],
+      "pattern": "^[^/]+/[^/]+$",
+      "description": "插件仓库 owner/name——规范映射键（市场索引匹配用）。git URL 自动解析或 --full-name 显式指定；无法推断为 null"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "验证执行时间（ISO 8601，UTC）"
+    },
+    "pass": {
+      "type": "boolean",
+      "description": "整体判定：waterfall 链完整 + tools/result 语义 + 静态规则全过"
+    },
+    "verifiedBy": {
+      "type": "string",
+      "pattern": "^dsh-plugin-verify@\\d+\\.\\d+\\.\\d+$",
+      "description": "校验器标识 + 版本（可追溯验证工具版本）"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "报告 schema 版本（本规范版本；演进走 RFC，fail-closed：不匹配即拒绝消费）"
+    },
+    "waterfallFound": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "实际捕获的 waterfall 链事件（全链 7 个：system-prompt/assemble → tools/post-execute）"
+    },
+    "waterfallMissing": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "缺失的 waterfall 链事件（pass=true 时为空）"
+    },
+    "rules": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/rule" },
+      "description": "逐条判定明细（R1 入口形态 / R2 patch YAML / P202 spawn / P401 single 槽 / R3 tools/result）——判定'理由'的机器可读形态"
+    },
+    "security": {
+      "oneOf": [
+        { "$ref": "#/$defs/securitySummary" },
+        { "type": "null", "description": "报告未含静态安全规则（旧产物）→ 未评估，不误报 clean" }
+      ]
+    },
+    "detail": {
+      "type": "string",
+      "description": "人类可读摘要（捕获事件数 | waterfall x/7 | tools/result 是否）"
+    }
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "required": ["name", "pass", "detail"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "description": "规则名（R1/R2/P202/P401/R3 前缀）" },
+        "pass": { "type": "boolean" },
+        "warn": { "type": "boolean", "description": "SHOULD 级命中（不判失败，仅警示）" },
+        "detail": { "type": "string" }
+      }
+    },
+    "securitySummary": {
+      "type": "object",
+      "required": ["status", "warnings"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "enum": ["clean", "warnings"], "description": "clean=静态安全规则无警示；warnings=有 SHOULD 级命中" },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["rule", "detail"],
+            "additionalProperties": false,
+            "properties": {
+              "rule": { "type": "string" },
+              "detail": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
