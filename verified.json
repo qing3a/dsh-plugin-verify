@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-16T17:42:29.030Z",
+  "generatedAt": "2026-08-16T19:33:54.141Z",
   "description": "DSH 插件运行时验证开放数据层（dsh-plugin-verify 判定站产出）",
   "verifiedBy": "dsh-plugin-verify@0.1.2",
   "reportBaseUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/",
@@ -247,6 +247,38 @@
             "detail": "⚠️ [SHOULD P-401] 1 处注册 single 槽——第三方 priority 恒低，注册即 shadow 官方 UI 并破坏其子槽声明（如 sidebar.workspaces.directoryFlow 链路）: src\\client\\index.tsx 注册 sidebar.workspaces.s"
           }
         ]
+      }
+    },
+    {
+      "name": "llm-fallbacks",
+      "fullName": "omdsh-dev/dsh-llm-fallbacks",
+      "repo": "https://github.com/omdsh-dev/dsh-llm-fallbacks",
+      "verdict": "pass",
+      "verifiedBy": "dsh-plugin-verify@0.1.2",
+      "verifiedAt": "2026-08-17",
+      "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/llm-fallbacks-2026-08-17.json",
+      "schemaVersion": 1,
+      "waterfall": "7/7",
+      "toolsResult": true,
+      "security": {
+        "status": "clean",
+        "warnings": []
+      }
+    },
+    {
+      "name": "subagent-max",
+      "fullName": "aaravarr/dsh-subagent-max",
+      "repo": "https://github.com/aaravarr/dsh-subagent-max",
+      "verdict": "pass",
+      "verifiedBy": "dsh-plugin-verify@0.1.2",
+      "verifiedAt": "2026-08-17",
+      "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/subagent-max-2026-08-17.json",
+      "schemaVersion": 1,
+      "waterfall": "7/7",
+      "toolsResult": true,
+      "security": {
+        "status": "clean",
+        "warnings": []
       }
     }
   ]

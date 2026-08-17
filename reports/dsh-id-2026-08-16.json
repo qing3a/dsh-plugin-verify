@@ -52,5 +52,6 @@
     "status": "clean",
     "warnings": []
   },
-  "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是"
+  "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是",
+  "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/dsh-id-2026-08-16.json"
 }

@@ -2,7 +2,7 @@
 
 > DSH 插件**判定站**：每个插件经过同一套运行时验证（7/7 waterfall + tools/result），通过才给 ✅ Verified 徽标。**与 awesome-dsh-plugins（全量分级观测）互补：它做 L0-L4 全量观测分级，我们把 L4 运行实测做深（7/7 waterfall + tools/result）。**
 
-![verified](https://img.shields.io/badge/Verified%20插件-14-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![reports](https://img.shields.io/badge/可复现报告-14-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
+![verified](https://img.shields.io/badge/Verified%20插件-18-blue) ![runtime](https://img.shields.io/badge/判定-运行时实测-green) ![reports](https://img.shields.io/badge/可复现报告-18-green) ![method](https://img.shields.io/badge/方法论-官方Discussion%23462-green)
 
 - **找可信插件**：按场景浏览，每个插件带 Verified 徽标 + 验证日期 + 可复现报告——证据可复现的运行时验证（7/7 waterfall + tools/result）
 - **装得放心**：徽标 = 通过了完整 agent 循环审查；附带安装指引与安全提示
@@ -194,11 +194,12 @@
 
 ### 🧠 模型与编排（Models & Orchestration）
 
-*子代理委派、模型切换/回退、桥接——让模型编排更灵活，待收录*
+*子代理委派、模型切换/回退、桥接——让模型编排更灵活*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
-| *待收录* | — | 生态已有 dsh-subagent-max / dsh-llm-fallback 等热点插件，验证后收录于此 | — | — |
+| [dsh-subagent-max](https://github.com/aaravarr/dsh-subagent-max) | ✅ | 双面插件：`subagent_with_model` 工具（每次调用可指定子代理的 model/provider）+ 多面板实时子代理查看器（host 面已验证，client 面 web UI 不在 headless 判定范围） | 2026-08-17 | [view](reports/subagent-max-2026-08-17.json) |
+| [dsh-llm-fallbacks](https://github.com/omdsh-dev/dsh-llm-fallbacks) | ✅ | 基于角色的模型重试与备用策略：LLM 请求持续失败（重试耗尽/鉴权/配额/限流）时自动走 provider/model 回退链（v0.2.1，纯挂载 + 自带 gateway） | 2026-08-17 | [view](reports/llm-fallbacks-2026-08-17.json) |
 
 ### 📦 导入与迁移（Import & Migration）
 
@@ -294,6 +295,8 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 | dsh-memory-evolve | [reports/memory-evolve-2026-08-16.json](reports/memory-evolve-2026-08-16.json) | ✅ |
 | dsh-hub-panel | [reports/hub-panel-2026-08-16.json](reports/hub-panel-2026-08-16.json) | ✅ |
 | dsh-id | [reports/dsh-id-2026-08-16.json](reports/dsh-id-2026-08-16.json) | ✅ |
+| dsh-subagent-max | [reports/subagent-max-2026-08-17.json](reports/subagent-max-2026-08-17.json) | ✅ |
+| dsh-llm-fallbacks | [reports/llm-fallbacks-2026-08-17.json](reports/llm-fallbacks-2026-08-17.json) | ✅ |
 
 > 报告均为 2026-08-14 用修正后 CLI（rules[] + R3）绝对路径重验版本，非早期空转版本；2026-08-16 七份（sentinel/navbar/notification/modsearch/memory-evolve/hub-panel/dsh-id）为当日独立复验。
 
