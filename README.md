@@ -117,7 +117,7 @@
 | [dsh-sentinel](https://github.com/fuhefei/dsh-sentinel) | ✅ | 事件驱动唤醒：文件/命令/HTTP/进程/Webhook 触发（v0.10.0，按判定站建议修复 webServer 必选注入 + heartbeat unref；修复后作者即用 dsh-plugin-verify 复测通过，判定站独立复验一致） | 2026-08-16 | [view](reports/sentinel-2026-08-16.json) |
 | [dsh-automation](https://github.com/titanwings/dsh-automation) | ⓘ | 定时/自动化任务调度：cron 触发、并发限制、人工审批门、历史回放；`automationDomainSpec` 数据域（依赖 zod/luxon，非 zero-dep） | 2026-08-15 复验 | — |
 | [dsh-loop](https://github.com/vlln/dsh-loop) | 候选 | `/loop` 定时循环 | — | — |
-| [dsh-auto-continue](https://github.com/HsiangNianian/dsh-auto-continue) | 候选 | 网络波动/超时导致回合失败后自动发"继续"续跑，无人值守必备 | — | — |
+| [dsh-auto-continue](https://github.com/HsiangNianian/dsh-auto-continue) | ✅ | 网络波动/超时导致回合失败后自动发"继续"续跑，无人值守必备（纯 client 面零依赖，headless 全激活） | 2026-08-17 | [view](reports/auto-continue-2026-08-17.json) |
 
 ### 💾 记忆与上下文（Memory & Context）
 
@@ -208,7 +208,8 @@
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
-| *待收录* | — | 生态已有 dsh-claude-move / dsh-chat-import（13 源全保真导入）等，验证后收录于此 | — | — |
+| [dsh-chat-import](https://github.com/Nwflower/dsh-chat-import) | ⓘ | 14+ 源会话导入（Claude Code/Codex/ChatGPT 等，全保真）——命令/工具式（`/import`、`import_agents` 等）+ web 平台，手动触发路径不在 agent 事件链内，headless 验证方法覆盖不到（方法边界，非插件缺陷） | 2026-08-17 | — |
+| *待收录* | — | 生态另有 dsh-claude-move（四源迁移向导）等，验证后收录 | — | — |
 
 ### 🎮 乐子与皮肤（Fun & Themes）
 

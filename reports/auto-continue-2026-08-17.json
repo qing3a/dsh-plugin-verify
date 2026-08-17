@@ -1,0 +1,57 @@
+{
+  "plugin": "dsh-auto-continue",
+  "repo": "C:/Users/Administrator/Desktop/ds/deepseek-harness",
+  "fullName": "HsiangNianian/dsh-auto-continue",
+  "date": "2026-08-17T17:29:41.462Z",
+  "pass": true,
+  "verifiedBy": "dsh-plugin-verify@0.1.2",
+  "schemaVersion": 1,
+  "waterfallFound": [
+    "system-prompt/assemble",
+    "agent/pre-step",
+    "agent/request",
+    "llm/stream",
+    "tools/pre-execute",
+    "tools/execute",
+    "tools/post-execute"
+  ],
+  "waterfallMissing": [],
+  "rules": [
+    {
+      "name": "R1-entry-shape",
+      "pass": true,
+      "detail": "入口 C:\\Users\\Administrator\\Desktop\\ds\\_tmp_pilot\\touch\\dsh-auto-continue\\lib\\index.js：未见 namespace 形式（name+apply），静态形态检查不适用（default=null）"
+    },
+    {
+      "name": "R2-patch-yaml",
+      "pass": true,
+      "detail": "patch ./cordis.patch.yml：!!js 表达式均位于 config 子树（8 行）"
+    },
+    {
+      "name": "P202-spawn-usage",
+      "pass": true,
+      "detail": "P-202 未见裸 child_process spawn（无导入或仅封装调用）"
+    },
+    {
+      "name": "P401-single-slot",
+      "pass": true,
+      "detail": "P-401 未见 single 槽注册（slots.register 未命中官方 single 槽清单）"
+    },
+    {
+      "name": "R3-tools-result",
+      "pass": true,
+      "detail": "工具真实执行成功（1 次结果，无 isError）"
+    },
+    {
+      "name": "R4-function-smoke",
+      "pass": true,
+      "detail": "功能冒烟通过：工具 pwsh 收到参数（含 \"echo ok\"），参数真实到达执行层"
+    }
+  ],
+  "security": {
+    "status": "clean",
+    "warnings": []
+  },
+  "detail": "捕获事件: 13 | waterfall: 7/7 | tools/result: 是",
+  "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/auto-continue-2026-08-17.json"
+}
