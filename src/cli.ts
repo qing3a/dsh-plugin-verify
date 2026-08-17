@@ -13,7 +13,7 @@
  */
 
 import { spawn, spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
@@ -29,6 +29,9 @@ const WATERFALL_CHAIN: ReadonlyArray<readonly [string, string]> = [
   ['tools/execute', 'waterfall'],
   ['tools/post-execute', 'waterfall'],
 ]
+
+/** 工具层冒烟抽样数：超多工具插件（如 30 工具）只冒烟前 N 个，防验证拖垮 */
+const SMOKE_SAMPLE = 3
 
 interface CliArgs {
   pluginPath: string
@@ -189,18 +192,108 @@ function removeAuditor(repoPath: string): void {
   }
 }
 
+/** 带依赖插件 link 前先装依赖。
+ * ⚠️ 实测（2026-08-17，chat-import fzstd / dsh-TUI 30 deps）：link 安装不会解析插件自身
+ *    dependencies，缺依赖 → ERR_MODULE_NOT_FOUND 加载失败，误判"运行时未激活"。
+ *    必须在 link 前对插件目录 pnpm install（幂等，无依赖时跳过）。 */
+function ensureDeps(pluginPath: string): void {
+  const pkgPath = join(pluginPath, 'package.json')
+  if (!existsSync(pkgPath)) return
+  const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as { dependencies?: Record<string, string> }
+  const deps = Object.keys(pkg.dependencies ?? {})
+  if (deps.length === 0) return
+  const modulesDir = join(pluginPath, 'node_modules')
+  if (existsSync(modulesDir) && deps.every((d) => existsSync(join(modulesDir, d)))) return
+  process.stderr.write(`[deps] ${deps.length} 个依赖待安装（${deps.slice(0, 5).join(', ')}${deps.length > 5 ? '…' : ''}）\n`)
+  const res = run('pnpm', ['install', '--no-frozen-lockfile'], { cwd: pluginPath, timeoutMs: 300_000 })
+  if (res.code !== 0) {
+    throw new Error(`插件依赖安装失败:\n${res.stdout.slice(-500)}`)
+  }
+}
+
+/** 是否命令/工具式插件：lib/ 下存在 tools.register 调用。
+ * 这类插件经 ctx.tools.register 暴露工具给 agent，但工具是手动/按需调用，
+ * 不挂在 waterfall 事件链上——7/7 事件链测不到，走工具层冒烟通道。
+ * ⚠️ 必须同时匹配 .js 与 .mjs（ESM 插件如 chat-import 的 lib/*.mjs，2026-08-17 实测漏检）。 */
+function isToolsPlugin(pluginPath: string): boolean {
+  const libDir = join(pluginPath, 'lib')
+  if (!existsSync(libDir)) return false
+  return readdirSync(libDir).some((f) => {
+    if (!/\.m?js$/u.test(f)) return false
+    const text = readFileSync(join(libDir, f), 'utf8')
+    return /ctx\.tools\.register|tools\.register\(/.test(text)
+  })
+}
+
+/** 枚举插件声明的工具名（defineTool 块内 name 字段）。
+ * 静态提取，用于工具层冒烟的目标清单；取前 max 个防超大插件（如 30 工具）拖垮验证。 */
+function enumerateTools(pluginPath: string, max = 8): string[] {
+  const libDir = join(pluginPath, 'lib')
+  if (!existsSync(libDir)) return []
+  const names = new Set<string>()
+  for (const file of readdirSync(libDir)) {
+    if (!/\.m?js$/u.test(file)) continue
+    const text = readFileSync(join(libDir, file), 'utf8')
+    // 兼容两种形态：defineTool({ name: 'x', ... }) 与 register(defineTool({ name: 'x', ... }))
+    for (const re of [
+      /defineTool\(\{[\s\S]*?name:\s*['"]([^'"]+)['"]/g,
+      /register\(defineTool\(\{[\s\S]*?name:\s*['"]([^'"]+)['"]/g,
+    ]) {
+      for (const m of text.matchAll(re)) names.add(m[1] as string)
+    }
+  }
+  return [...names].slice(0, max)
+}
+
+/** 工具层冒烟判定：目标工具真实注册 + 调用成功。
+ * 核心是"能装且工具能用"：UNKNOWN_TOOL（postmortem 0002）= 注册面被破坏判失败；
+ * 有成功 tools/result = 工具真实处理了调用。参数级断言（R4 的 execArgs）对插件
+ * 工具不适用（底层可能是任意执行器），故以注册 + 成功调用为准。 */
+function analyzeToolSmoke(dumpPath: string, toolName: string): RuntimeRuleResult {
+  if (!existsSync(dumpPath)) {
+    return { name: `TS-${toolName}`, pass: false, detail: `无 dump——工具 ${toolName} 冒烟未执行` }
+  }
+  const raw = JSON.parse(readFileSync(dumpPath, 'utf8')) as {
+    records: Array<{ event: string; payload?: { isError?: boolean; code?: string; message?: string } }>
+  }
+  const results = raw.records.filter((r) => r.event === 'tools/result')
+  const blocked = results.some((r) => r.payload?.isError
+    && r.payload.code === 'UNKNOWN_TOOL'
+    && (r.payload.message ?? '').includes(toolName))
+  const anyOk = results.some((r) => !r.payload?.isError)
+  if (blocked) {
+    return { name: `TS-${toolName}`, pass: false, detail: `工具 ${toolName} 未注册（UNKNOWN_TOOL）——注册面被插件/组合破坏` }
+  }
+  if (!anyOk) {
+    return { name: `TS-${toolName}`, pass: false, detail: `工具 ${toolName} 已触发但无成功结果（dump ${results.length} 条 tools/result）` }
+  }
+  return { name: `TS-${toolName}`, pass: true, detail: `工具 ${toolName} 真实注册 + 调用成功（${results.length} 条 tools/result，无 isError）` }
+}
+
 /** 启动 mock-llm，返回句柄。用 node 直跑 bin.ts（避免 shell:true 拼参数破坏 JSON 引号）。
  * ⚠️ 平台边界（2026-08-14 实测，读 base/cordis.patch.yml）：DSH 按平台启停 shell——
  *   Windows 上 `tool-bash disabled: !!js process.platform === 'win32'`（bash 未注册），
  *   正确工具是 `pwsh`；非 Windows 才是 bash。mock 触发工具必须平台感知，
  *   否则 UNKNOWN_TOOL/INVALID_ARGS 空转循环（旧验证从未真实触发工具执行）。
  *   ⚠️ 工具参数必须含 `description`（tool-bash/tool-pwsh 的 validateBashArgs/PwshToolArgs
- *   都要求 command + description，缺 description 抛 INVALID_ARGS）。 */
-function startMockLlm(repoPath: string): { child: ReturnType<typeof spawn>; port: number; ready: Promise<void>; toolName: string } {
+ *   都要求 command + description，缺 description 抛 INVALID_ARGS）。
+ *   @param opts.toolName 触发工具名（默认平台 shell pwsh/bash）；工具层冒烟传插件工具名。
+ *   @param opts.toolArgs 触发工具参数 JSON（默认 echo ok；插件工具用其合法缺省参数如 {}）。
+ *   @param opts.repeatLast 是否 --repeat-last。事件链验证需要多轮；工具层冒烟必须关掉
+ *     （repeat-last 会让 agent 无限重发工具调用不收敛，timeout 杀进程导致 dump 写丢——
+ *     2026-08-17 试点实测）。
+ *   @param opts.sequence mock 行为序列（默认 tool_call_success,success）。工具层冒烟用
+ *     更长的 success 尾段，减少序列耗尽后 script_exhausted 空响应导致的 agent 重试段。 */
+function startMockLlm(
+  repoPath: string,
+  opts: { toolName?: string; toolArgs?: string; repeatLast?: boolean; sequence?: string } = {},
+): { child: ReturnType<typeof spawn>; port: number; ready: Promise<void>; toolName: string } {
   const port = 8000
   const isWin = process.platform === 'win32'
-  const toolName = isWin ? 'pwsh' : 'bash'
-  const toolArgs = JSON.stringify({ command: 'echo ok', description: 'verify tool execution' })
+  const toolName = opts.toolName ?? (isWin ? 'pwsh' : 'bash')
+  const toolArgs = opts.toolArgs ?? JSON.stringify({ command: 'echo ok', description: 'verify tool execution' })
+  const repeatLast = opts.repeatLast ?? true
+  const sequence = opts.sequence ?? 'tool_call_success,success'
   const child = spawn(
     process.execPath,
     [
@@ -209,8 +302,8 @@ function startMockLlm(repoPath: string): { child: ReturnType<typeof spawn>; port
       '--host', '127.0.0.1',
       '--port', String(port),
       '--api-key', 'mock-key',
-      '--sequence', 'tool_call_success,success',
-      '--repeat-last',
+      '--sequence', sequence,
+      ...(repeatLast ? ['--repeat-last'] : []),
       '--tool-name', toolName,
       '--tool-arguments', toolArgs,
     ],
@@ -248,11 +341,13 @@ function killTree(child: ReturnType<typeof spawn>): void {
   }
 }
 
-/** 跑 headless agent（auditor 已 link 进 profile，经 DSH_EVENT_AUDIT_DUMP 导出） */
-function runHeadless(repoPath: string, dumpPath: string): string {
+/** 跑 headless agent（auditor 已 link 进 profile，经 DSH_VERIFY_DUMP 导出）。
+ * @param prompt 会话指令：事件链验证用 "run the bash tool once and report"；
+ *   工具层冒烟用 "call the tool <name> once and stop"（单轮收敛，无 repeat-last）。 */
+function runHeadless(repoPath: string, dumpPath: string, prompt = 'run the bash tool once and report'): string {
   const res = run(
     'pnpm',
-    ['dsh', '--profile', 'headless', 'run the bash tool once and report'],
+    ['dsh', '--profile', 'headless', prompt],
     {
       cwd: repoPath,
       env: {
@@ -370,8 +465,67 @@ export async function main(): Promise<number> {
     preflight(args.repoPath)
     console.log(`[2/5] 安装插件 + verify-auditor 到 headless profile`)
     const auditorDir = join(__dirname, '..', 'auditor')
+    ensureDeps(args.pluginPath)                      // ⚠️ 带依赖插件 link 前先装依赖（2026-08-17 实测缺省加载失败）
     installPlugin(args.repoPath, auditorDir, 'verify-auditor')
     installPlugin(args.repoPath, args.pluginPath, '待验证插件')
+
+    const toolsKind = isToolsPlugin(args.pluginPath)
+    if (toolsKind) {
+      // ── 工具层冒烟通道：命令/工具式插件（2026-08-17 试点验证成立）──
+      // 不挂 waterfall 事件链的插件 7/7 测不到（0/7 误判），改验"工具真实注册 + 可调用"。
+      const tools = enumerateTools(args.pluginPath)
+      console.log(`[3/5] 命令/工具式插件：枚举 ${tools.length} 个声明工具，抽样冒烟前 ${Math.min(SMOKE_SAMPLE, tools.length)} 个`)
+      const smokeRules: RuntimeRuleResult[] = []
+      const triggered: string[] = []
+      for (const tool of tools.slice(0, SMOKE_SAMPLE)) {
+        console.log(`      → mock 触发 ${tool}`)
+        // 单轮收敛：repeatLast=false（repeat-last 无限重发不收敛，dump 写丢，2026-08-17 实测）
+        const mock = startMockLlm(args.repoPath, {
+          toolName: tool,
+          toolArgs: '{}',
+          repeatLast: false,
+          sequence: 'tool_call_success,success,success,success,success',
+        })
+        try {
+          await mock.ready
+          const output = runHeadless(args.repoPath, args.dumpPath, `call the tool ${tool} once and stop`)
+          if (args.verbose) console.log(output)
+          const r = analyzeToolSmoke(args.dumpPath, tool)
+          if (r.pass) triggered.push(tool)
+          smokeRules.push(r)
+          console.log(`      ${r.pass ? '✓' : '✗'} ${r.name}: ${r.detail}`)
+        } finally {
+          killTree(mock.child)
+        }
+      }
+      const allRules = [...staticResult.rules, ...smokeRules]
+      const pass = smokeRules.length > 0 && smokeRules.every((r) => r.pass)
+      const detail = `工具层冒烟: ${triggered.length}/${smokeRules.length} 通过（共声明 ${tools.length}，抽样）| 交互命令层未测`
+      const report = {
+        plugin: args.pluginPath,
+        repo: args.repoPath,
+        fullName: deriveFullName(args.pluginPath, args.fullName),
+        date: new Date().toISOString(),
+        pass,
+        kind: 'tools' as const,
+        verifiedBy: selfVersion(),
+        schemaVersion: 1,
+        waterfallFound: [] as string[],
+        waterfallMissing: [] as string[],
+        toolSmoke: { declared: tools.length, sampled: smokeRules.length, triggered, detail },
+        rules: allRules,
+        security: securitySummary(allRules),
+        detail,
+      }
+      const reportFile = join(args.outDir, 'verify-report.json')
+      writeFileSync(reportFile, JSON.stringify(report, null, 2))
+      console.log(`\n${pass ? '✅ 通过（工具层）' : '❌ 未通过'} | ${detail}`)
+      console.log(`报告: ${reportFile}`)
+      removePlugin(args.repoPath, args.pluginPath)
+      removeAuditor(args.repoPath)
+      return pass ? 0 : 1
+    }
+
     console.log('[3/5] 启动 mock-llm (port 8000)')
     const mock = startMockLlm(args.repoPath)
     try {
@@ -389,6 +543,7 @@ export async function main(): Promise<number> {
         fullName: deriveFullName(args.pluginPath, args.fullName),
         date: new Date().toISOString(),
         pass: result.pass,
+        kind: 'chain' as const,
         verifiedBy: selfVersion(),
         schemaVersion: 1,
         waterfallFound: result.found,

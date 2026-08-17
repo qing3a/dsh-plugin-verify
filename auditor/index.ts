@@ -72,6 +72,23 @@ export function apply(ctx: Context): void {
   const records: AuditRecord[] = []
   let seq = 0
 
+  // headless dump：事件驱动即时写盘 + 进程退出兜底。
+  // ⚠️ 2026-08-17 实测：headless 会话可能不自然退出（mock 序列耗尽后 agent 重试循环，
+  //   timeout 杀进程），仅靠 process.on('exit') 写 dump 会丢全部记录（dump 不落盘）。
+  //   改为每次记录后即时写（记录量小，开销可忽略），保证工具层冒烟/事件链判定
+  //   在进程被杀时也能拿到快照。用独立变量 DSH_VERIFY_DUMP：避免与 dsh-event-auditor
+  //   的 DSH_EVENT_AUDIT_DUMP 冲突。
+  const dumpPath = process.env.DSH_VERIFY_DUMP
+  const writeDump = (): void => {
+    if (dumpPath === undefined || dumpPath.length === 0) return
+    const { writeFileSync } = req('node:fs') as { writeFileSync: (p: string, d: string) => void }
+    try {
+      writeFileSync(dumpPath, JSON.stringify({ records }, null, 2))
+    } catch {
+      // 写盘失败不阻塞事件链（dump 是诊断证据，非宿主行为）
+    }
+  }
+
   for (const [eventName, mode] of WATERFALL_CHAIN) {
     const dispose = watchWaterfall(ctx, eventName, (...args: unknown[]) => {
       const rec: AuditRecord = { event: eventName, mode, at: Date.now(), seq: seq++ }
@@ -94,6 +111,7 @@ export function apply(ctx: Context): void {
         }
       }
       records.push(rec)
+      writeDump()
     })
     ctx.effect(() => dispose, `verify-auditor: watch ${eventName}`)
   }
@@ -116,16 +134,11 @@ export function apply(ctx: Context): void {
       }
     }
     records.push(rec)
+    writeDump()
   })
   ctx.effect(() => disposeResult, 'verify-auditor: watch tools/result')
 
-  // headless dump：进程退出前写快照（exit 回调是同步的，用 createRequire 同步读）
-  // ⚠️ 用独立变量 DSH_VERIFY_DUMP：避免与 dsh-event-auditor 的 DSH_EVENT_AUDIT_DUMP 冲突
-  const dumpPath = process.env.DSH_VERIFY_DUMP
   if (dumpPath !== undefined && dumpPath.length > 0) {
-    process.on('exit', () => {
-      const { writeFileSync } = req('node:fs') as { writeFileSync: (p: string, d: string) => void }
-      writeFileSync(dumpPath, JSON.stringify({ records }, null, 2))
-    })
+    process.on('exit', writeDump)
   }
 }
