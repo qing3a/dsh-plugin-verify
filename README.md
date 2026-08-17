@@ -187,11 +187,12 @@
 
 ### ⌨️ 终端与 TUI（Terminal & TUI）
 
-*终端界面、命令行增强——高星集中（dsh-TUI 1441★），待收录*
+*终端界面、命令行增强——高星集中（dsh-TUI 1805★），待收录*
 
 | 插件 | 状态 | 说明 | 验证日期 | 报告 |
 |---|---|---|---|---|
-| *待收录* | — | 生态已有 dsh-TUI / dsh-bash-terminal 等热点插件，验证后收录于此 | — | — |
+| [dsh-TUI](https://github.com/ccch1mneyyy/dsh-TUI) | ⓘ | 高星终端 UI 插件（★1805）：**独立 dsh-tui profile 专用**（bin 自举 `dsh --profile dsh-tui`），经 dsh-adapter channel/events 挂 agents 服务，不挂 headless 事件链——0/7 为 UI/通道式方法边界，非插件缺陷（30 依赖装齐复验仍 0/7；peerDeps 锁 rc.6 系同源表现） | 2026-08-17 | — |
+| *待收录* | — | 生态另有 dsh-bash-terminal 等热点插件，验证后收录 | — | — |
 
 ### 🧠 模型与编排（Models & Orchestration）
 
