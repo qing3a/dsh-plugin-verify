@@ -26,6 +26,7 @@ const KNOWN_CATEGORIES = [
   '搜索与联网',
   '记忆与上下文',
   '调试与诊断',
+  '调试与观测',
   '远程与访问',
   '成本与用量',
   '通知与提醒',
@@ -36,8 +37,18 @@ const KNOWN_CATEGORIES = [
   '乐子与皮肤',
 ]
 
-function sha256(path) {
-  return createHash('sha256').update(readFileSync(path)).digest('hex')
+/**
+ * 跨平台哈希：返回原始字节与 LF 归一化两种变体。
+ * 仓库 blob 可能是 LF 或 CRLF（取决于提交端配置），工作树又可能被
+ * autocrlf 再转一次——哈希必须与作者提交时的形态对齐才不误报。
+ */
+function sha256Variants(path) {
+  const raw = readFileSync(path)
+  const rawHash = createHash('sha256').update(raw).digest('hex')
+  const lfHash = createHash('sha256')
+    .update(raw.toString('utf8').replace(/\r\n/g, '\n'), 'utf8')
+    .digest('hex')
+  return new Set([rawHash, lfHash])
 }
 
 function check(ok, msg) {
@@ -114,8 +125,8 @@ function main() {
       if (fname === 'manifest.json') continue // 自引用跳过（见上）
       const fpath = join(dir, fname)
       if (existsSync(fpath)) {
-        const actual = sha256(fpath)
-        if (!check(actual === expectedSha, `${fname} SHA-256 一致`)) blocked = true
+        const actual = sha256Variants(fpath)
+        if (!check(actual.has(expectedSha), `${fname} SHA-256 一致`)) blocked = true
       } else if (!check(false, `${fname} 存在（manifest 声明但缺失）`)) {
         blocked = true
       }

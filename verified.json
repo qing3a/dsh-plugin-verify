@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-17T17:32:49.901Z",
+  "generatedAt": "2026-08-19T09:09:12.258Z",
   "description": "DSH 插件运行时验证开放数据层（dsh-plugin-verify 判定站产出）",
   "verifiedBy": "dsh-plugin-verify@0.1.2",
   "reportBaseUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/",
@@ -78,6 +78,19 @@
       "verifiedBy": "dsh-plugin-verify@0.1.2",
       "verifiedAt": "2026-08-14",
       "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/tray-2026-08-14.json",
+      "schemaVersion": 1,
+      "waterfall": "7/7",
+      "toolsResult": true,
+      "security": null
+    },
+    {
+      "name": "dsh-vision-router",
+      "fullName": "ysr666/dsh-vision-router",
+      "repo": "https://github.com/ysr666/dsh-vision-router",
+      "verdict": "pass",
+      "verifiedBy": "dsh-plugin-verify@0.1.2",
+      "verifiedAt": "2026-08-14",
+      "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/vision-router-2026-08-14.json",
       "schemaVersion": 1,
       "waterfall": "7/7",
       "toolsResult": true,

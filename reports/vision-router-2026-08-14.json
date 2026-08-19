@@ -1,0 +1,39 @@
+{
+  "plugin": "/tmp/vr-main",
+  "repo": "/tmp/deepseek-harness",
+  "date": "2026-08-14T16:07:57.710Z",
+  "pass": true,
+  "waterfallFound": [
+    "system-prompt/assemble",
+    "agent/pre-step",
+    "agent/request",
+    "llm/stream",
+    "tools/pre-execute",
+    "tools/execute",
+    "tools/post-execute"
+  ],
+  "waterfallMissing": [],
+  "rules": [
+    {
+      "name": "R1-entry-shape",
+      "pass": true,
+      "detail": "入口 /tmp/vr-main/index.js：namespace 形式 ✓ 且无裸 export default"
+    },
+    {
+      "name": "R2-patch-yaml",
+      "pass": true,
+      "detail": "patch ./cordis.patch.yml：!!js 表达式均位于 config 子树（26 行）"
+    },
+    {
+      "name": "R3-tools-result",
+      "pass": true,
+      "detail": "工具真实执行成功（1 次结果，无 isError）"
+    }
+  ],
+  "detail": "捕获事件: 16 | waterfall: 7/7 | tools/result: 是",
+  "fullName": "ysr666/dsh-vision-router",
+  "verifiedBy": "dsh-plugin-verify@0.1.2",
+  "schemaVersion": 1,
+  "reportUrl": "https://github.com/qing3a/dsh-plugin-verify/blob/main/reports/vision-router-2026-08-14.json",
+  "security": null
+}

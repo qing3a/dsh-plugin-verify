@@ -37,6 +37,7 @@ const REPO_MAP = {
   'memory-evolve': 'https://github.com/csyangwen/dsh-memory-evolve',
   'hub-panel': 'https://github.com/jiangxingfan1-coder/dsh-hub-panel',
   'dsh-id': 'https://github.com/jiangxingfan1-coder/dsh-id',
+  'vision-router': 'https://github.com/ysr666/dsh-vision-router',
 }
 
 /** 插件显示名（报告文件名前缀 → 插件名） */
@@ -57,6 +58,7 @@ const NAME_MAP = {
   'memory-evolve': 'dsh-memory-evolve',
   'hub-panel': 'dsh-hub-panel',
   'dsh-id': 'dsh-id',
+  'vision-router': 'dsh-vision-router',
 }
 
 const files = readdirSync(reportsDir).filter((f) => f.endsWith('.json') && !f.startsWith('.'))
