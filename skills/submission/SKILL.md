@@ -1,14 +1,35 @@
+---
+name: dsh-plugin-verify-submission
+description: Run runtime verification and the Verified DSH Plugins submission workflow for a DSH plugin.
+whenToUse: Use when publishing, submitting, or revalidating a DSH plugin against a DSH checkout.
+---
+
 # DSH 插件投稿 Skill — 把插件上架到 Verified DSH Plugins
 
 > 本 skill 描述如何把你的 DSH 插件提交到 [Verified DSH Plugins 目录](https://qing3a.github.io/dsh-plugin-verify/)。适合人类作者和 AI agent（Claude Code / Codex / DSH 自身）使用——按步骤执行即可完成投稿。
+>
+> **安装后注册到 DSH**：`npm install` 或 `npx` 只提供 CLI，不会自动把本 Skill 注册到 DSH。将本文件复制到 `${DSH_HOME:-$HOME/.dsh}/skills/dsh-plugin-verify-submission/SKILL.md`，然后刷新当前 Skill catalog 或启动新会话。不要用 `dsh plugin --profile web add` 安装本工具；它是验证 CLI，验证时才会临时装载 `verify-auditor`。
 
 ---
+
+## 零、先注册到 DSH 用户 Skill
+
+从本仓库 checkout 执行以下命令；如果使用已安装 npm 包，把源文件路径替换为该包目录下的 `skills/submission/SKILL.md`：
+
+```bash
+DSH_HOME="${DSH_HOME:-$HOME/.dsh}"
+mkdir -p "$DSH_HOME/skills/dsh-plugin-verify-submission"
+cp skills/submission/SKILL.md \
+  "$DSH_HOME/skills/dsh-plugin-verify-submission/SKILL.md"
+```
+
+DSH 用户 Skill 必须位于 `$DSH_HOME/skills/<name>/SKILL.md`，并保留本文件开头的 `name`、`description` 和 `whenToUse` frontmatter。注册后刷新 Skill catalog 或启动新会话；这一步只注册 Agent Skill，不把 CLI 安装成 DSH 运行时插件。
 
 ## 一、这是什么
 
 Verified DSH Plugins 是 DeepSeek Harness 插件的**判定站**：每个插件经过完整运行时验证（7/7 waterfall + tools/result）才收录。投稿 = 验证 + 上架 = 获得 ✅ Verified 徽标 + 被发现 + 被安装。
 
-**收录前提（硬门槛）**：你的插件必须通过 [dsh-plugin-verify](https://github.com/qing3a/dsh-plugin-verify) 的运行时验证（`✅ 通过 | waterfall: 7/7 | tools/result: 是`），并声明符合[《DSH 插件开发与设计规范建议 v0.1》](../../docs/plugin-standards.md)（基于官方源码分析与官方风格提炼，含入口/配置红线、生命周期、交互、验证、发布约定）。
+**收录前提（硬门槛）**：你的插件必须通过 [dsh-plugin-verify](https://github.com/qing3a/dsh-plugin-verify) 的运行时验证（`✅ 通过 | waterfall: 7/7 | tools/result: 是`），并声明符合[《DSH 插件开发与设计规范建议 v0.1》](https://github.com/qing3a/dsh-plugin-verify/blob/main/docs/plugin-standards.md)（基于官方源码分析与官方风格提炼，含入口/配置红线、生命周期、交互、验证、发布约定）。
 
 ## 二、参与流程（6 步）
 

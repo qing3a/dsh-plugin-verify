@@ -40,7 +40,7 @@
 | **报告 Schema** | 验证报告机器可读规范 v1（fullName 映射键 · verifiedBy · schemaVersion · security，市场/索引/CI 可消费） | [schema/report.schema.json](schema/report.schema.json) |
 | **避坑案例库** | 写 DSH 插件会踩的坑与规避（赋能者视角，素材来自验证实践，随管道积累） | [docs/case-studies/](docs/case-studies/README.md) |
 | **文章** | 从零拆解 / 踩坑全记录 / 验证实战 / 判定站从零到跑通（4 篇） | [posts/](#文章) |
-| **投稿系统** | Agent 友好的 6 步投稿 Skill + 自检 gate | [skills/submission/SKILL.md](skills/submission/SKILL.md) |
+| **投稿系统** | Agent 友好的 6 步投稿 Skill + DSH 用户 Skill 注册 + 自检 gate | [skills/submission/SKILL.md](skills/submission/SKILL.md) |
 
 > [!IMPORTANT]
 > **Verified 徽标 ≠ 官方背书。** 判定基于当日 mainline、证据可复现；DSH 每天更新，插件可能漂移，安装前请查看验证日期与插件自身 README。
@@ -348,6 +348,25 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 - **P401**（single 槽注册）——第三方 priority 恒低，注册即 shadow 官方 UI 并破坏其子槽声明
 
 结果聚合进 `verified.json` 的 `security` 字段（`clean` / `warnings` / `未评估`）。**自动批准类插件是生态定时炸弹**——判定站的「运行时验证 + 静态安全规则」双重防线，让"可信"从口号变成可复现的证据。
+
+---
+
+## 🤖 Agent Skill：安装与注册
+
+`dsh-plugin-verify` 是 CLI 验证工具，`skills/submission/SKILL.md` 是配套的 Agent Skill。安装 npm 包或执行 `npx` 只提供 CLI，不会自动把 Skill 注册到 DSH；没有注册时，Agent 可能无法在插件发布任务中发现并主动使用它。
+
+从本仓库 checkout 注册到当前 DSH 用户 Skill：
+
+```bash
+DSH_HOME="${DSH_HOME:-$HOME/.dsh}"
+mkdir -p "$DSH_HOME/skills/dsh-plugin-verify-submission"
+cp skills/submission/SKILL.md \
+  "$DSH_HOME/skills/dsh-plugin-verify-submission/SKILL.md"
+```
+
+如果从已安装的 npm 包注册，将 `skills/submission/SKILL.md` 替换为该包目录下的同名文件。Skill 必须位于 `$DSH_HOME/skills/<name>/SKILL.md`，并保留文件开头的 `name`、`description` 与 `whenToUse` frontmatter。DSH 会监视用户 Skill 目录；当前会话目录未更新时，刷新 Skill catalog 或启动新会话。
+
+不要运行 `dsh plugin --profile web add @qing3a/dsh-plugin-verify` 来注册 Skill。该命令用于安装 DSH 运行时组合包，而本项目是 CLI；执行验证时 CLI 才会临时将 `verify-auditor` 与待验证插件装入 headless profile，结束后自动清理。
 
 ---
 
