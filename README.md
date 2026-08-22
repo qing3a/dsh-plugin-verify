@@ -38,7 +38,7 @@
 | **审核标准** | 评审标准总纲 v0.1.0：P（插件必检）/D（dsh-desktop 基线）/C（官方贡献）三集规则，钉定 mainline `47f94385`，含版本规程与溯源修正 | [docs/review-standards.md](docs/review-standards.md) |
 | **验证报告** | 12 份可复现报告（插件 commit · mainline commit · 验证日期） | [reports/](#资源中心) |
 | **文章** | 从零拆解 / 踩坑全记录 / 验证实战 / 判定站从零到跑通（4 篇） | [posts/](#文章) |
-| **投稿系统** | Agent 友好的 6 步投稿 Skill + 自检 gate | [skills/submission/SKILL.md](skills/submission/SKILL.md) |
+| **投稿系统** | Agent 友好的 6 步投稿 Skill + DSH 用户 Skill 注册 + 自检 gate | [skills/submission/SKILL.md](skills/submission/SKILL.md) |
 
 > [!IMPORTANT]
 > **Verified 徽标 ≠ 官方背书。** 判定基于当日 mainline、证据可复现；DSH 每天更新，插件可能漂移，安装前请查看验证日期与插件自身 README。
@@ -282,6 +282,25 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 |---|---|
 | [awesome-dsh-plugins](https://github.com/AdamPlatin123/awesome-dsh-plugins) | DSH 插件全量分级观测（L0-L4）；我们的运行实测证据可用于其 L4 登记 |
 | [deepseek-harness 官方仓库](https://github.com/deepseek-ai/deepseek-harness) | DSH 本体；插件跑在它之上 |
+
+---
+
+## 🤖 Agent Skill：安装与注册
+
+`dsh-plugin-verify` 是 CLI 验证工具，`skills/submission/SKILL.md` 是配套的 Agent Skill。安装 npm 包或执行 `npx` 只提供 CLI，不会自动把 Skill 注册到 DSH；没有注册时，Agent 可能无法在插件发布任务中发现并主动使用它。
+
+从本仓库 checkout 注册到当前 DSH 用户 Skill：
+
+```bash
+DSH_HOME="${DSH_HOME:-$HOME/.dsh}"
+mkdir -p "$DSH_HOME/skills/dsh-plugin-verify-submission"
+cp skills/submission/SKILL.md \
+  "$DSH_HOME/skills/dsh-plugin-verify-submission/SKILL.md"
+```
+
+如果从已安装的 npm 包注册，将 `skills/submission/SKILL.md` 替换为该包目录下的同名文件。Skill 必须位于 `$DSH_HOME/skills/<name>/SKILL.md`，并保留文件开头的 `name`、`description` 与 `whenToUse` frontmatter。DSH 会监视用户 Skill 目录；当前会话目录未更新时，刷新 Skill catalog 或启动新会话。
+
+不要运行 `dsh plugin --profile web add @qing3a/dsh-plugin-verify` 来注册 Skill。该命令用于安装 DSH 运行时组合包，而本项目是 CLI；执行验证时 CLI 才会临时将 `verify-auditor` 与待验证插件装入 headless profile，结束后自动清理。
 
 ---
 
