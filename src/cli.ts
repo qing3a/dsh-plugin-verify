@@ -119,6 +119,25 @@ function run(cmd: string, args: string[], opts: { cwd?: string; env?: Record<str
   return { code: res.status ?? 1, stdout: res.stdout ?? '' }
 }
 
+/** Run one node script directly with an args array — no shell, so a
+ *  space-containing prompt stays a single argument (shell:true would split it). */
+function runNode(args: string[], opts: { cwd?: string; env?: Record<string, string>; timeoutMs?: number } = {}): { code: number; stdout: string } {
+  const res = spawnSync(process.execPath, args, {
+    cwd: opts.cwd,
+    env: { ...process.env, ...opts.env },
+    encoding: 'utf8',
+    timeout: opts.timeoutMs ?? 120_000,
+  })
+  return { code: res.status ?? 1, stdout: res.stdout ?? '' }
+}
+
+/** Platform-aware default chain prompt: base registers pwsh on Windows, bash elsewhere. */
+function defaultHeadlessPrompt(): string {
+  return process.platform === 'win32'
+    ? 'run the pwsh tool once and report'
+    : 'run the bash tool once and report'
+}
+
 /** 前置检查：DSH checkout 存在 + pnpm 可用 + host lib 已构建 */
 function preflight(repoPath: string): void {
   if (!existsSync(join(repoPath, 'pnpm-workspace.yaml'))) {
@@ -344,10 +363,9 @@ function killTree(child: ReturnType<typeof spawn>): void {
 /** 跑 headless agent（auditor 已 link 进 profile，经 DSH_VERIFY_DUMP 导出）。
  * @param prompt 会话指令：事件链验证用 "run the bash tool once and report"；
  *   工具层冒烟用 "call the tool <name> once and stop"（单轮收敛，无 repeat-last）。 */
-function runHeadless(repoPath: string, dumpPath: string, prompt = 'run the bash tool once and report'): string {
-  const res = run(
-    'pnpm',
-    ['dsh', '--profile', 'headless', prompt],
+function runHeadless(repoPath: string, dumpPath: string, prompt = defaultHeadlessPrompt()): string {
+  const res = runNode(
+    ['--import', 'tsx/esm', 'apps/cli/src/bin.ts', '--profile', 'headless', prompt],
     {
       cwd: repoPath,
       env: {
