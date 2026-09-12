@@ -1,0 +1,19 @@
+{
+  "schema": "dsh-plugin-submission/v1",
+  "plugin": {
+    "name": "dsh-clock-context",
+    "repo": "apex-mochen/dsh-clock-context",
+    "category": "调试与观测",
+    "description": "每轮把当前日期时间注入运行上下文，让 agent 读到准确时间而不是靠推算。",
+    "version": "0.1.0"
+  },
+  "verification": {
+    "report": "verify-report.json",
+    "date": "2026-09-12",
+    "pass": true
+  },
+  "files": {
+    "verify-report.json": "5d04418f5f437e272c9bf563f3d3a24165da0fa1218404c2e0cb78ae9b063f3a",
+    "self_check.json": "fc955b6d23181240a955c948e9da2e970b86b047c8774543d3b87602f0d79b9e"
+  }
+}
