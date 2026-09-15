@@ -119,6 +119,32 @@ function run(cmd: string, args: string[], opts: { cwd?: string; env?: Record<str
   return { code: res.status ?? 1, stdout: res.stdout ?? '' }
 }
 
+/** 不经 shell 直接起 node（参数数组原样传递）。
+ * ⚠️ Windows 上 `run()` 的 `shell: true` 会把命令拼成一条字符串**不加重引号**交给
+ *    cmd.exe，带空格的 prompt 被拆成多个参数，`dsh` 收到乱参数直接退出 → headless 步
+ *    整体不可用（issue #3，Windows 必现，waterfall 链通道等于没有）。DSH 自己的
+ *    `pnpm dsh` 就是 `node --import tsx/esm apps/cli/src/bin.ts`，所以这里照抄该形态
+ *    绕开 shell 与 pnpm 两层。stderr 不吞：headless 的加载失败全走 stderr，CLI 早先
+ *    只收 stdout，会把它显示成"零事件/dump 不存在"这种误导性的空结果。 */
+function runNode(args: string[], opts: { cwd?: string; env?: Record<string, string>; timeoutMs?: number } = {}): { code: number; stdout: string; stderr: string } {
+  const res = spawnSync(process.execPath, args, {
+    cwd: opts.cwd,
+    env: { ...process.env, ...opts.env },
+    encoding: 'utf8',
+    timeout: opts.timeoutMs ?? 120_000,
+    shell: false,
+  })
+  return { code: res.status ?? 1, stdout: res.stdout ?? '', stderr: res.stderr ?? '' }
+}
+
+/** 平台感知的默认会话指令：DSH 的 base patch 按平台启停 shell——Windows 上
+ *    `tool-bash disabled: !!js process.platform === 'win32'`，注册的是 pwsh（见
+ *    docs/runtime-validation.md 平台边界）。写死 bash 在 Windows 上只是措辞错误，
+ *    但 mock 之外的会话模型会照着这句话去调一个不存在的工具。 */
+function defaultHeadlessPrompt(): string {
+  return process.platform === 'win32' ? 'run the pwsh tool once and report' : 'run the bash tool once and report'
+}
+
 /** 前置检查：DSH checkout 存在 + pnpm 可用 + host lib 已构建 */
 function preflight(repoPath: string): void {
   if (!existsSync(join(repoPath, 'pnpm-workspace.yaml'))) {
@@ -342,12 +368,11 @@ function killTree(child: ReturnType<typeof spawn>): void {
 }
 
 /** 跑 headless agent（auditor 已 link 进 profile，经 DSH_VERIFY_DUMP 导出）。
- * @param prompt 会话指令：事件链验证用 "run the bash tool once and report"；
+ * @param prompt 会话指令：事件链验证用平台默认（`defaultHeadlessPrompt()`）；
  *   工具层冒烟用 "call the tool <name> once and stop"（单轮收敛，无 repeat-last）。 */
-function runHeadless(repoPath: string, dumpPath: string, prompt = 'run the bash tool once and report'): string {
-  const res = run(
-    'pnpm',
-    ['dsh', '--profile', 'headless', prompt],
+function runHeadless(repoPath: string, dumpPath: string, prompt = defaultHeadlessPrompt()): string {
+  const res = runNode(
+    ['--import', 'tsx/esm', 'apps/cli/src/bin.ts', '--profile', 'headless', prompt],
     {
       cwd: repoPath,
       env: {
@@ -358,6 +383,8 @@ function runHeadless(repoPath: string, dumpPath: string, prompt = 'run the bash 
       timeoutMs: 120_000,
     },
   )
+  // stderr 透传（不混入 stdout）：headless 的失败原因都在这里
+  if (res.stderr) process.stderr.write(res.stderr)
   return res.stdout
 }
 
