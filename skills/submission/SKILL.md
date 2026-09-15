@@ -13,7 +13,7 @@ Verified DSH Plugins 是 DeepSeek Harness 插件的**判定站**：每个插件�
 ## 二、参与流程（6 步）
 
 1. **确认资格**：插件仓库公开、打 `dsh-plugin` topic、package.json 合法（name/入口/运行时依赖/许可证）
-2. **跑验证**：`npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>`
+2. **跑验证**：`npx @qing3a/dsh-plugin-verify <你的插件路径> --repo <DSH checkout>`
 3. **收集报告**：记录 `verify-report.json` 的完整内容
 4. **生成提交包**：按下方模板创建 `submissions/<owner>/<plugin>/` 下三个文件
 5. **跑自检**：`node scripts/check-submission.mjs submissions/<owner>/<plugin>`
@@ -66,7 +66,7 @@ Verified DSH Plugins 是 DeepSeek Harness 插件的**判定站**：每个插件�
 
 ### submissions/<owner>/<plugin>/verify-report.json
 
-`npx dsh-plugin-verify` 的完整输出（pass 必须为 true）。
+`npx @qing3a/dsh-plugin-verify` 的完整输出（pass 必须为 true）。
 
 ## 四、分类表（category 必填其一，与场景目录一致）
 

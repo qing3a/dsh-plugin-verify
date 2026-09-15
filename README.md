@@ -31,7 +31,7 @@
 | 资产 | 内容 | 入口 |
 |---|---|---|
 | **判定站主页** | 分类目录 + 数字卡片 + 投稿 CTA（GitHub Pages） | [index.html](index.html) |
-| **验证 CLI** | 一条命令跑运行时验证（mock-llm + waterfall + rules[]） | `npx dsh-plugin-verify <插件路径> --repo <DSH checkout>` |
+| **验证 CLI** | 一条命令跑运行时验证（mock-llm + waterfall + rules[]） | `npx @qing3a/dsh-plugin-verify <插件路径> --repo <DSH checkout>` |
 | **验证方法论** | 无 API Key 验证 waterfall 行为：mock-llm / headless / dump 完整路径 | [docs/runtime-validation.md](docs/runtime-validation.md) · [Discussion 462](https://github.com/deepseek-ai/deepseek-harness/discussions/462) |
 | **插件规范建议** | 《DSH 插件开发与设计规范建议 v0.1》（每条带依据与踩坑记录） | [docs/plugin-standards.md](docs/plugin-standards.md) |
 | **评审清单** | 人工评审层：官方 defensive-patterns + postmortem 检查点 | [docs/review-checklist.md](docs/review-checklist.md) |
@@ -42,6 +42,11 @@
 | **文章** | 从零拆解 / 踩坑全记录 / 验证实战 / 判定站从零到跑通（4 篇） | [posts/](#文章) |
 | **投稿系统** | Agent 友好的 6 步投稿 Skill + 自检 gate | [skills/submission/SKILL.md](skills/submission/SKILL.md) |
 
+> [!NOTE]
+> **CLI 请带 scope 调用：`npx @qing3a/dsh-plugin-verify <插件路径> --repo <DSH checkout>`。**
+> npm 上无 scope 的 `dsh-plugin-verify` 是另一位作者已发布的包，且**没有声明 `bin`** ——
+> 直接跑 `npx dsh-plugin-verify` 会以 `npm error could not determine executable to run` 失败（exit 1）。
+> 本项目的包名是 [`@qing3a/dsh-plugin-verify`](https://www.npmjs.com/package/@qing3a/dsh-plugin-verify)。
 > [!IMPORTANT]
 > **Verified 徽标 ≠ 官方背书。** 判定基于当日 mainline、证据可复现；DSH 每天更新，插件可能漂移，安装前请查看验证日期与插件自身 README。
 
@@ -308,7 +313,7 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 
 | 工具 | 用途 |
 |---|---|
-| `npx dsh-plugin-verify <插件路径> --repo <DSH checkout>` | 验证 CLI：mock-llm + headless + waterfall 捕获 + rules[] 判定 |
+| `npx @qing3a/dsh-plugin-verify <插件路径> --repo <DSH checkout>` | 验证 CLI：mock-llm + headless + waterfall 捕获 + rules[] 判定 |
 | [scripts/check-submission.mjs](scripts/check-submission.mjs) | 投稿自检 gate：验证提交包（manifest + self_check + verify-report）是否齐全 |
 | [scripts/static-rules.mjs](scripts/static-rules.mjs) | 静态规则（R1/R2/R3）——确定性信号，最终以运行时判定为准 |
 | [scripts/radar-upgrade-pr.mjs](scripts/radar-upgrade-pr.mjs) | 批量把已验证插件在 awesome-dsh-plugins 登记为运行级 ✅ 的 PR 脚本 |
@@ -360,7 +365,7 @@ system-prompt/assemble → agent/pre-step → agent/request → llm/stream
 ```bash
 # 1. 准备 DSH checkout（已 build:lib:host && build:lib:client）
 # 2. 跑验证
-npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
+npx @qing3a/dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
 # ✅ 通过 | 捕获事件: 13 | waterfall: 7/7 | tools/result: 是
 # 3. 通过后提交收录（见下）
 # 4. 上架 → 获得徽标，进入分类目录

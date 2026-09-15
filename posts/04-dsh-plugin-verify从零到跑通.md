@@ -11,7 +11,7 @@
 生态当时的状态：awesome-dsh-plugins 雷达显示 286 个插件、运行时验证几乎空白。**验证方法有，验证工具没有。** 这就是 dsh-plugin-verify 的起点：把方法论变成一条命令。
 
 ```
-npx dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
+npx @qing3a/dsh-plugin-verify <你的插件路径> --repo <DSH checkout>
 ✅ 通过 | 捕获事件: 13 | waterfall: 7/7 | tools/result: 是
 ```
 
