@@ -1,0 +1,19 @@
+{
+  "schema": "dsh-plugin-submission/v1",
+  "plugin": {
+    "name": "dsh-sidebar-frog",
+    "repo": "zengqingsong/dsh-sidebar-frog",
+    "category": "界面与体验",
+    "description": "为 DeepSeek Harness 增加可弹出式侧边栏：产物账本与文件树并列，离线预览代码 / Markdown（数学 + Mermaid）/ PDF / HTML / 图片 / CSV 表格 / Word·Excel·PowerPoint / 音视频，支持就地编辑保存、只读 Git 切片与一键弹出为第二显示器标签页。",
+    "version": "1.2.0"
+  },
+  "verification": {
+    "report": "verify-report.json",
+    "date": "2026-09-15",
+    "pass": true
+  },
+  "files": {
+    "verify-report.json": "03fd6b15b3923a04df7757a06503459923e7b61d14c3380d747a8733af79fc77",
+    "self_check.json": "fc955b6d23181240a955c948e9da2e970b86b047c8774543d3b87602f0d79b9e"
+  }
+}
