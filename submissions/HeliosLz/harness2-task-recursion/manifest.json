@@ -1,0 +1,19 @@
+{
+  "schema": "dsh-plugin-submission/v1",
+  "plugin": {
+    "name": "dsh-harness2-task-recursion",
+    "repo": "HeliosLz/harness2-recursion",
+    "category": "模型与编排",
+    "description": "任务级递归：失败信号触发 Propose → 隔离子代理 Probe → Gate-v4 准入 → 账本 v3；离线评估与受控应用解耦",
+    "version": "0.2.1"
+  },
+  "verification": {
+    "report": "verify-report.json",
+    "date": "2026-10-21",
+    "pass": true
+  },
+  "files": {
+    "verify-report.json": "e227723f5b3619aded9e590ddbcfd7c4533ad806593de105c747d30ee415fa02",
+    "self_check.json": "fc955b6d23181240a955c948e9da2e970b86b047c8774543d3b87602f0d79b9e"
+  }
+}

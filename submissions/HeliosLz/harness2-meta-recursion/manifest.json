@@ -1,0 +1,19 @@
+{
+  "schema": "dsh-plugin-submission/v1",
+  "plugin": {
+    "name": "dsh-harness2-meta-recursion",
+    "repo": "HeliosLz/harness2-recursion",
+    "category": "记忆与上下文",
+    "description": "Harnessing 级递归：只从真实评估认证结果学习，维护可审计经验库与只读 harness2Experience 门面",
+    "version": "0.2.1"
+  },
+  "verification": {
+    "report": "verify-report.json",
+    "date": "2026-10-21",
+    "pass": true
+  },
+  "files": {
+    "verify-report.json": "cd3333477bea0b8fd2c7eddd9e5459b84592145a986309aa80e2f97e3fd2c96c",
+    "self_check.json": "fc955b6d23181240a955c948e9da2e970b86b047c8774543d3b87602f0d79b9e"
+  }
+}
