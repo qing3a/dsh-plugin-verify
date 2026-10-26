@@ -1,0 +1,19 @@
+{
+  "schema": "dsh-plugin-submission/v1",
+  "plugin": {
+    "name": "@openbiliclaw/dsh-plugin",
+    "repo": "whiteguo233/dsh-openbiliclaw",
+    "category": "界面与体验",
+    "description": "把 OpenBiliClaw 装进 DSH 侧边栏：推荐流、内容库、对话、画像与设置面板，并注册 22 个 Agent Bridge 工具，让 Agent 也能读推荐、答探测、闭环学习。",
+    "version": "0.6.2"
+  },
+  "verification": {
+    "report": "verify-report.json",
+    "date": "2026-10-26",
+    "pass": true
+  },
+  "files": {
+    "verify-report.json": "ad57e67642e2dcee2a8a75eef44f64b5d4dca6473471e3158138a7d47e408116",
+    "self_check.json": "fc955b6d23181240a955c948e9da2e970b86b047c8774543d3b87602f0d79b9e"
+  }
+}
